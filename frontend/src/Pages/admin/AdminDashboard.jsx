@@ -3,6 +3,7 @@ import { moderationApi } from '../../api/moderationApi';
 import { FiBookOpen, FiClock, FiCheckCircle, FiXCircle, FiAlertTriangle, FiHelpCircle } from 'react-icons/fi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
+//gygyh
 const StatCard = ({ icon: Icon, label, value, color }) => (
   <div className="card flex items-center gap-4">
     <div className={`p-3 rounded-lg ${color}`}>
