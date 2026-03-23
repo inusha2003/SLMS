@@ -1,5 +1,12 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
-import { decodeToken, getToken, removeToken, setToken, generateMockToken } from '../utils/tokenUtils';
+import {
+  decodeToken,
+  getToken,
+  removeToken,
+  setToken,
+  generateMockToken,
+  isTokenValid,
+} from '../utils/tokenUtils';
 
 export const AuthContext = createContext(null);
 
@@ -9,45 +16,55 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const initializeAuth = useCallback(() => {
-    const storedToken = getToken();
-    if (storedToken) {
-      try {
-        // For demo: decode our base64 payload
-        const decoded = JSON.parse(atob(storedToken));
-        const now = Math.floor(Date.now() / 1000);
-        if (decoded.exp > now) {
+    try {
+      const storedToken = getToken();
+      if (storedToken && isTokenValid(storedToken)) {
+        const decoded = decodeToken(storedToken);
+        if (decoded && decoded.userId && decoded.role) {
           setUser(decoded);
           setTokenState(storedToken);
         } else {
           removeToken();
         }
-      } catch {
+      } else {
         removeToken();
       }
+    } catch (err) {
+      removeToken();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
 
-  const loginAs = (role) => {
+  const loginAs = useCallback((role) => {
     const mockToken = generateMockToken(role);
     setToken(mockToken);
-    const decoded = JSON.parse(atob(mockToken));
+    const decoded = decodeToken(mockToken);
     setUser(decoded);
     setTokenState(mockToken);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     removeToken();
     setUser(null);
     setTokenState(null);
+  }, []);
+
+  const value = {
+    user,
+    token,
+    loading,
+    loginAs,
+    logout,
+    isAuthenticated: !!user,
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, loginAs, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

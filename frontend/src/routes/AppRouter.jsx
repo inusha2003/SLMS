@@ -4,71 +4,236 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 // Admin Pages
-import AdminDashboard from '../Pages/admin/AdminDashboard';
-import ManageNotes from '../Pages/admin/ManageNotes';
-import PendingApprovals from '../Pages/admin/PendingApprovals';
-import Discussions from '../Pages/admin/Discussions';
-import AdminQAForum from '../Pages/admin/AdminQAForum';
-import ModerationPanel from '../Pages/admin/ModerationPanel';
-// Student Pages
-import StudentDashboard from '../Pages/student/StudentDashboard';
-import MyNotes from '../Pages/student/MyNotes';
-import BrowseNotes from '../Pages/student/BrowseNotes';
-import NoteDetail from '../Pages/student/NoteDetail';
-import StudentQAForum from '../Pages/student/StudentQAForum';
-import UploadNote from '../Pages/student/UploadNote';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import ManageNotes from '../pages/admin/ManageNotes';
+import PendingApprovals from '../pages/admin/PendingApprovals';
+import Discussions from '../pages/admin/Discussions';
+import AdminQAForum from '../pages/admin/AdminQAForum';
+import ModerationPanel from '../pages/admin/ModerationPanel';
 
-// Demo Entry Page
+// Student Pages
+import StudentDashboard from '../pages/student/StudentDashboard';
+import MyNotes from '../pages/student/MyNotes';
+import BrowseNotes from '../pages/student/BrowseNotes';
+import NoteDetail from '../pages/student/NoteDetail';
+import StudentQAForum from '../pages/student/StudentQAForum';
+import UploadNote from '../pages/student/UploadNote';
+
+// Entry
 import EntryPage from '../pages/EntryPage';
 
-const ProtectedRoute = ({ children, allowedRole }) => {
+// ─── Route Guards ────────────────────────────────────────────────────────────
+
+const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return <LoadingSpinner />;
-  if (!user) return <Navigate to="/" replace />;
-  if (allowedRole && user.role !== allowedRole) {
-    return <Navigate to={user.role === 'Admin' ? '/admin/dashboard' : '/student/dashboard'} replace />;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-lms-darkest flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
-  return <DashboardLayout>{children}</DashboardLayout>;
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user.role !== 'Admin') {
+    return <Navigate to="/student/dashboard" replace />;
+  }
+
+  return (
+    <DashboardLayout>
+      {children}
+    </DashboardLayout>
+  );
 };
 
-const AppRouter = () => {
+const StudentRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-lms-darkest flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user.role !== 'Student') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return (
+    <DashboardLayout>
+      {children}
+    </DashboardLayout>
+  );
+};
+
+const SharedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-lms-darkest flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return (
+    <DashboardLayout>
+      {children}
+    </DashboardLayout>
+  );
+};
+
+// ─── Root Redirect ────────────────────────────────────────────────────────────
+
+const RootRedirect = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-lms-darkest flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <EntryPage />;
+  }
+
+  if (user.role === 'Admin') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return <Navigate to="/student/dashboard" replace />;
+};
+
+// ─── Main Router ─────────────────────────────────────────────────────────────
+
+const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Entry / Root */}
+        <Route path="/" element={<RootRedirect />} />
+
+        {/* ── Admin Routes ── */}
         <Route
-          path="/"
+          path="/admin/dashboard"
           element={
-            user
-              ? <Navigate to={user.role === 'Admin' ? '/admin/dashboard' : '/student/dashboard'} replace />
-              : <EntryPage />
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-notes"
+          element={
+            <AdminRoute>
+              <ManageNotes />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/pending"
+          element={
+            <AdminRoute>
+              <PendingApprovals />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/discussions"
+          element={
+            <AdminRoute>
+              <Discussions />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/qa-forum"
+          element={
+            <AdminRoute>
+              <AdminQAForum />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/moderation"
+          element={
+            <AdminRoute>
+              <ModerationPanel />
+            </AdminRoute>
           }
         />
 
-        {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<ProtectedRoute allowedRole="Admin"><AdminDashboard /></ProtectedRoute>} />
-        <Route path="/admin/manage-notes" element={<ProtectedRoute allowedRole="Admin"><ManageNotes /></ProtectedRoute>} />
-        <Route path="/admin/pending" element={<ProtectedRoute allowedRole="Admin"><PendingApprovals /></ProtectedRoute>} />
-        <Route path="/admin/discussions" element={<ProtectedRoute allowedRole="Admin"><Discussions /></ProtectedRoute>} />
-        <Route path="/admin/qa-forum" element={<ProtectedRoute allowedRole="Admin"><AdminQAForum /></ProtectedRoute>} />
-        <Route path="/admin/moderation" element={<ProtectedRoute allowedRole="Admin"><ModerationPanel /></ProtectedRoute>} />
+        {/* ── Student Routes ── */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <StudentRoute>
+              <StudentDashboard />
+            </StudentRoute>
+          }
+        />
+        <Route
+          path="/student/browse-notes"
+          element={
+            <StudentRoute>
+              <BrowseNotes />
+            </StudentRoute>
+          }
+        />
+        <Route
+          path="/student/my-notes"
+          element={
+            <StudentRoute>
+              <MyNotes />
+            </StudentRoute>
+          }
+        />
+        <Route
+          path="/student/upload-note"
+          element={
+            <StudentRoute>
+              <UploadNote />
+            </StudentRoute>
+          }
+        />
+        <Route
+          path="/student/qa-forum/*"
+          element={
+            <StudentRoute>
+              <StudentQAForum />
+            </StudentRoute>
+          }
+        />
 
-        {/* Student Routes */}
-        <Route path="/student/dashboard" element={<ProtectedRoute allowedRole="Student"><StudentDashboard /></ProtectedRoute>} />
-        <Route path="/student/browse-notes" element={<ProtectedRoute allowedRole="Student"><BrowseNotes /></ProtectedRoute>} />
-        <Route path="/student/my-notes" element={<ProtectedRoute allowedRole="Student"><MyNotes /></ProtectedRoute>} />
-        <Route path="/student/upload-note" element={<ProtectedRoute allowedRole="Student"><UploadNote /></ProtectedRoute>} />
-        <Route path="/student/qa-forum/*" element={<ProtectedRoute allowedRole="Student"><StudentQAForum /></ProtectedRoute>} />
+        {/* ── Shared Routes ── */}
+        <Route
+          path="/notes/:id"
+          element={
+            <SharedRoute>
+              <NoteDetail />
+            </SharedRoute>
+          }
+        />
 
-        {/* Shared Note Detail */}
-        <Route path="/notes/:id" element={<ProtectedRoute><NoteDetail /></ProtectedRoute>} />
-
-        {/* Redirect QA detail for admin */}
-        <Route path="/qa/:id" element={<ProtectedRoute><NoteDetail /></ProtectedRoute>} />
-
+        {/* ── Catch All ── */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
