@@ -1,73 +1,119 @@
 @import "tailwindcss";
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* 1. සියලුම Imports ඉහළින්ම තිබිය යුතුයි */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* 2. Theme Configuration (Custom Colors මෙතනට තමයි එන්නේ) */
+@theme {
+  --font-inter: "Inter", system-ui, sans-serif;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  /* SLMS Project එකට අදාළ Colors */
+  --color-lms-primary: #484A87;
+  --color-lms-secondary: #6366f1;
+  --color-lms-dark: #251F39;
+  --color-lms-darkest: #1a1625;
+  --color-lms-accent: #334155;
+  --color-lms-muted: #475569;
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* 3. Base Styles */
+@layer base {
+  body {
+    background-color: #20152B;
+    color: #e2e8f0;
+    font-family: var(--font-inter);
   }
-  a:hover {
-    color: #747bff;
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-lms-primary) var(--color-lms-dark);
   }
-  button {
-    background-color: #f9f9f9;
+
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--color-lms-dark);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-lms-primary);
+    border-radius: 3px;
+  }
+}
+
+/* 4. Components (Custom Classes) */
+@layer components {
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
+           text-slate-300 hover:bg-lms-primary hover:text-white
+           transition-all duration-200 cursor-pointer;
+  }
+
+  .sidebar-link.active {
+    @apply bg-lms-secondary text-white shadow-lg;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-lms-primary hover:bg-lms-secondary text-white
+           rounded-lg font-medium text-sm transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-lms-secondary focus:ring-offset-2
+           focus:ring-offset-lms-dark disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-700 hover:bg-red-600 text-white
+           rounded-lg font-medium text-sm transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-red-500;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-lms-accent hover:bg-lms-muted text-white
+           rounded-lg font-medium text-sm transition-all duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-lms-darkest border border-lms-primary
+           rounded-lg text-white placeholder-slate-500 text-sm
+           focus:outline-none focus:ring-2 focus:ring-lms-secondary focus:border-transparent
+           transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-lms-dark border border-lms-primary/30 rounded-xl p-5 shadow-lg;
+  }
+
+  .card-hover {
+    @apply bg-lms-dark border border-lms-primary/30 rounded-xl p-5 shadow-lg
+           hover:border-lms-secondary/60 hover:shadow-lms-primary/20
+           transition-all duration-200 cursor-pointer;
+  }
+
+  .badge-pending {
+    @apply px-2 py-1 text-xs font-medium bg-yellow-900/50 text-yellow-300
+           border border-yellow-700/50 rounded-full;
+  }
+
+  .badge-approved {
+    @apply px-2 py-1 text-xs font-medium bg-green-900/50 text-green-300
+           border border-green-700/50 rounded-full;
+  }
+
+  .badge-rejected {
+    @apply px-2 py-1 text-xs font-medium bg-red-900/50 text-red-300
+           border border-red-700/50 rounded-full;
+  }
+
+  .section-header {
+    @apply text-xl font-bold text-white mb-6 flex items-center gap-2;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-slate-300 mb-1;
+  }
+
+  .error-text {
+    @apply text-xs text-red-400 mt-1;
   }
 }

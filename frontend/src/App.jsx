@@ -1,70 +1,31 @@
-import { Route, Routes, useLocation } from "react-router-dom";
-import "./App.css";
-import Sidebar from "./Components/Sidebar.jsx";
-import AiContentGenerator from "./Components/AiContentGenerator.jsx";
-import FlashcardDecksPage from "./Pages/FlashcardDecksPage.jsx";
-import FlashcardStudyPage from "./Pages/FlashcardStudyPage.jsx";
-import McqBankPage from "./Pages/McqBankPage.jsx";
-import ExamInterfacePage from "./Pages/ExamInterfacePage.jsx";
-import ExamSchedulePage from "./Pages/ExamSchedulePage.jsx";
-import ExamResultPage from "./Pages/ExamResultPage.jsx";
-import AdminCreateExamPage from "./Pages/AdminCreateExamPage.jsx";
-import PerformancePage from "./Pages/PerformancePage.jsx";
-
-function pathToActiveKey(pathname) {
-  if (pathname.startsWith("/ai-tools")) return "ai-tools";
-  if (pathname.startsWith("/performance")) return "performance";
-  if (pathname.startsWith("/mcq-bank")) return "mcq-bank";
-  if (pathname.startsWith("/flashcards")) return "flashcards";
-  if (pathname.startsWith("/exam")) return "exams";
-  if (pathname.startsWith("/exams")) return "exams";
-  return "dashboard";
-}
-
-function DashboardHome() {
-  return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
-      <p className="mt-2 text-slate-300">
-        Welcome to SLMS. Use the sidebar to navigate.
-      </p>
-    </div>
-  );
-}
+import { AuthProvider } from './context/AuthContext';
+import AppRouter from './routes/AppRouter';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
-  const location = useLocation();
-  const active = pathToActiveKey(location.pathname);
-
   return (
-    <div className="flex min-h-screen bg-[#0a0a0c]">
-      <Sidebar active={active} />
-      <main className="min-h-screen flex-1 overflow-y-auto bg-[#0a0a0c]">
-        <Routes>
-          <Route path="/" element={<DashboardHome />} />
-          <Route path="/ai-tools" element={<AiContentGenerator />} />
-          <Route
-            path="/performance"
-            element={<PerformancePage />}
-          />
-          <Route path="/mcq-bank" element={<McqBankPage />} />
-          <Route path="/flashcards" element={<FlashcardDecksPage />} />
-          <Route path="/flashcards/study/:deckId" element={<FlashcardStudyPage />} />
-          <Route path="/exam/:examId/result" element={<ExamResultPage />} />
-          <Route path="/exam/:examId" element={<ExamInterfacePage />} />
-          <Route path="/exams" element={<ExamSchedulePage />} />
-          <Route path="/exams/create" element={<AdminCreateExamPage />} />
-          <Route
-            path="*"
-            element={
-              <div className="p-8 text-white">
-                <h1 className="text-xl font-semibold">Not found</h1>
-              </div>
-            }
-          />
-        </Routes>
-      </main>
-    </div>
+    <AuthProvider>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#251F39',
+            color: '#e2e8f0',
+            border: '1px solid rgba(57, 55, 119, 0.4)',
+            borderRadius: '10px',
+            fontSize: '13px',
+          },
+          success: {
+            iconTheme: { primary: '#4ade80', secondary: '#251F39' },
+          },
+          error: {
+            iconTheme: { primary: '#f87171', secondary: '#251F39' },
+          },
+        }}
+      />
+      <AppRouter />
+    </AuthProvider>
   );
 }
 
