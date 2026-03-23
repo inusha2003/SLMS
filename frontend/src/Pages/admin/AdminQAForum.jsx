@@ -55,7 +55,7 @@ const AdminQAForum = () => {
           className="input-field pl-9"
           placeholder="Search questions..."
         />
-      </div>
+      </div> 
 
       {loading ? (
         <LoadingSpinner />
