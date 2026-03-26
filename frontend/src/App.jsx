@@ -1,71 +1,69 @@
-import { Route, Routes, useLocation } from "react-router-dom";
-import "./App.css";
-import Sidebar from "./Components/Sidebar.jsx";
-import AiContentGenerator from "./Components/AiContentGenerator.jsx";
-import FlashcardDecksPage from "./Pages/FlashcardDecksPage.jsx";
-import FlashcardStudyPage from "./Pages/FlashcardStudyPage.jsx";
-import McqBankPage from "./Pages/McqBankPage.jsx";
-import ExamInterfacePage from "./Pages/ExamInterfacePage.jsx";
-import ExamSchedulePage from "./Pages/ExamSchedulePage.jsx";
-import ExamResultPage from "./Pages/ExamResultPage.jsx";
-import AdminCreateExamPage from "./Pages/AdminCreateExamPage.jsx";
-import PerformancePage from "./Pages/PerformancePage.jsx";
-
-function pathToActiveKey(pathname) {
-  if (pathname.startsWith("/ai-tools")) return "ai-tools";
-  if (pathname.startsWith("/performance")) return "performance";
-  if (pathname.startsWith("/mcq-bank")) return "mcq-bank";
-  if (pathname.startsWith("/flashcards")) return "flashcards";
-  if (pathname.startsWith("/exam")) return "exams";
-  if (pathname.startsWith("/exams")) return "exams";
-  return "dashboard";
-}
-
-function DashboardHome() {
-  return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
-      <p className="mt-2 text-slate-300">
-        Welcome to SLMS. Use the sidebar to navigate.
-      </p>
-    </div>
-  );
-}
-
-function App() {
-  const location = useLocation();
-  const active = pathToActiveKey(location.pathname);
+import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
+import { FullPageSpinner } from './components/Spinner';
+import Navbar from './Components/layout/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import Home from './Pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import ProfileSetup from './pages/ProfileSetup';
+import AdminPanel from './pages/AdminPanel';
+import Planner from './Pages/Planner';
+const App = () => {
+  const { loading } = useAuth();
+  const { dark } = useTheme();
+  if (loading) return <FullPageSpinner />;
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0c]">
-      <Sidebar active={active} />
-      <main className="min-h-screen flex-1 overflow-y-auto bg-[#0a0a0c]">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-body)' }}>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: dark ? '#1e293b' : '#ffffff',
+            color: dark ? '#f1f5f9' : '#1e293b',
+            border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`,
+            fontSize: '14px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+          },
+          success: { iconTheme: { primary: '#3b82f6', secondary: '#fff' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+        }}
+      />
+      <Navbar />
+      <main className="flex-1">
         <Routes>
-          <Route path="/" element={<DashboardHome />} />
-          <Route path="/ai-tools" element={<AiContentGenerator />} />
-          <Route
-            path="/performance"
-            element={<PerformancePage />}
-          />
-          <Route path="/mcq-bank" element={<McqBankPage />} />
-          <Route path="/flashcards" element={<FlashcardDecksPage />} />
-          <Route path="/flashcards/study/:deckId" element={<FlashcardStudyPage />} />
-          <Route path="/exam/:examId/result" element={<ExamResultPage />} />
-          <Route path="/exam/:examId" element={<ExamInterfacePage />} />
-          <Route path="/exams" element={<ExamSchedulePage />} />
-          <Route path="/exams/create" element={<AdminCreateExamPage />} />
-          <Route
-            path="*"
-            element={
-              <div className="p-8 text-white">
-                <h1 className="text-xl font-semibold">Not found</h1>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute requireProfile><Dashboard /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="*" element={
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <div className="text-center">
+                <h1 className="text-7xl font-black text-gradient">404</h1>
+                <p className="mt-3 text-lg" style={{ color: 'var(--text-secondary)' }}>Page not found</p>
               </div>
-            }
-          />
+              <Route
+  path="/planner"
+  element={
+    <ProtectedRoute requireProfile>
+      <Planner />
+    </ProtectedRoute>
+  }
+/>
+            </div>
+          } />
         </Routes>
       </main>
     </div>
   );
-}
+};
 
 export default App;
