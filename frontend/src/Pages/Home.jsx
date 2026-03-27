@@ -236,106 +236,101 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ══════ HOW IT WORKS ══════ */}
-      <section className="py-20 sm:py-28" style={{ backgroundColor: 'var(--bg-card)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div style={{ textAlign: 'center', maxWidth: '42rem', marginLeft: 'auto', marginRight: 'auto', marginBottom: '4rem' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 1rem', backgroundColor: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '9999px', marginBottom: '1rem' }}>
-              <Zap className="w-3.5 h-3.5 text-indigo-500" />
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', color: '#4f46e5', textTransform: 'uppercase' }}>Getting Started</span>
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: 'var(--text-primary)' }}>
-              Start Learning in <span className="text-gradient">3 Simple Steps</span>
-            </h2>
-          </div>
+      {/* ══════════════════════════════════════════════════════════════
+    HOW IT WORKS - PERFECTLY CENTERED VERSION
+    ══════════════════════════════════════════════════════════════ */}
+<section className="py-20 sm:py-28" style={{ backgroundColor: 'var(--bg-card)' }}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    
+    {/* Header Section - Centered */}
+    <div style={{ textAlign: 'center', maxWidth: '42rem', marginLeft: 'auto', marginRight: 'auto', marginBottom: '4rem' }} className="flex flex-col items-center">
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 1rem', backgroundColor: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '9999px', marginBottom: '1rem' }}>
+        <Zap className="w-3.5 h-3.5 text-indigo-500" />
+        <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', color: '#4f46e5', textTransform: 'uppercase' }}>Getting Started</span>
+      </div>
+      <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: 'var(--text-primary)' }}>
+        Start Learning in <span className="text-gradient">3 Simple Steps</span>
+      </h2>
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-16 left-[20%] w-[60%] h-0.5 bg-gradient-to-r from-blue-200 via-indigo-200 to-violet-200" />
-            {steps.map((step, i) => (
-              <div key={i} className="relative text-center group">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl mb-6 shadow-lg shadow-blue-500/20 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
-                  <step.icon className="w-10 h-10 text-white" />
-                </div>
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-8 shadow-md rounded-full flex items-center justify-center z-10" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                  <span className="text-xs font-black text-blue-600">{step.num}</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{step.title}</h3>
-                <p className="text-sm max-w-xs mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{step.desc}</p>
-              </div>
-            ))}
+    {/* Steps Grid - Centered Content */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative w-full justify-items-center">
+      <div className="hidden md:block absolute top-16 h-0.5 bg-gradient-to-r from-blue-200 via-indigo-200 to-violet-200" style={{ left: '50%', transform: 'translateX(-50%)', width: '60%' }} />
+      {steps.map((step, i) => (
+        <div key={i} className="relative text-center group flex flex-col items-center">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl mb-6 shadow-lg shadow-blue-500/20 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
+            <step.icon className="w-10 h-10 text-white" />
           </div>
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-8 shadow-md rounded-full flex items-center justify-center z-10" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+            <span className="text-xs font-black text-blue-600">{step.num}</span>
+          </div>
+          <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{step.title}</h3>
+          <p className="text-sm max-w-xs mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{step.desc}</p>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
-      {/* ══════ TESTIMONIALS ══════ */}
-      <section className="py-20 sm:py-28" style={{ backgroundColor: 'var(--bg-body)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <div style={{ textAlign: 'center', maxWidth: '42rem', marginLeft: 'auto', marginRight: 'auto', marginBottom: '4rem' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 1rem', backgroundColor: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '9999px', marginBottom: '1rem' }}>
-              <Star className="w-3.5 h-3.5 text-amber-500" />
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', color: '#d97706', textTransform: 'uppercase' }}>Student Reviews</span>
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: 'var(--text-primary)' }}>
-              Trusted by <span className="text-gradient">Thousands</span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <div key={i} className="card-hover">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />)}
-                </div>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>{`"${t.text}"`}</p>
-                <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20">
-                    <span className="text-sm font-bold text-white">{t.avatar}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{t.name}</p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* ══════ FINAL CTA ══════ */}
-      <section className="relative overflow-hidden">
-        <div className="hero-gradient">
-          <HeroBackground />
-          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center z-10">
-            <div className="inline-flex items-center justify-center w-20 h-20 glass-light rounded-3xl mb-8 animate-float">
-              <GraduationCap className="w-10 h-10 text-blue-400" />
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white">
-              Ready to Start Your <span className="text-gradient">Academic Journey</span>?
-            </h2>
-            <p className="mt-4 text-lg text-white/60 max-w-xl mx-auto">
-              Join thousands of students already excelling with SmartLMS.
-            </p>
+     {/* ══════ FINAL CTA ══════ */}
+<section className="relative overflow-hidden mt-32 mb-10"> 
+  {/* mt-32 මගින් උඩ Component එකෙන් සෑහෙන ඉඩක් වෙන් කරනවා */}
+  
+  <div className="hero-gradient min-h-[600px] flex items-center justify-center">
+    {/* min-h-[600px] මගින් background එකට අවම උසක් ලබා දෙනවා */}
+    
+    <HeroBackground />
+    
+    {/* py-32 මගින් ඇතුළත ඉඩ (Vertical Padding) සෑහෙන ප්‍රමාණයකින් වැඩි කරනවා */}
+    <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center z-10 flex flex-col items-center">
+      
+      {/* Icon එක සහ Text එක අතර ඉඩ (mb-10) */}
+      <div className="inline-flex items-center justify-center w-24 h-24 glass-light rounded-3xl mb-10 animate-float shadow-2xl shadow-blue-500/20">
+        <GraduationCap className="w-12 h-12 text-blue-400" />
+      </div>
 
-            {/* ★ CTA BUTTONS — FIXED ★ */}
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/register" className="btn-cta-white group w-full sm:w-auto">
-                Create Free Account
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link to="/login" className="btn-cta-outline w-full sm:w-auto">
-                Sign In
-              </Link>
-            </div>
+      <h2 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight">
+        Ready to Start Your <br className="hidden sm:block" />
+        <span className="text-gradient">Academic Journey</span>?
+      </h2>
 
-            <div className="mt-8 flex items-center justify-center gap-6 text-xs text-white/30">
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-green-400/60" />Free Forever</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-green-400/60" />No Credit Card</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-green-400/60" />Cancel Anytime</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <p className="mt-8 text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+        Join thousands of students already excelling with SmartLMS. 
+        Your future starts with a single click.
+      </p>
+
+      {/* ★ CTA BUTTONS — BETTER SPACING ★ */}
+      <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
+        <Link to="/register" className="btn-cta-white group w-full sm:min-w-[240px] py-4 shadow-lg shadow-white/5">
+          Create Free Account
+          <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+        </Link>
+        <Link to="/login" className="btn-cta-outline w-full sm:min-w-[200px] py-4">
+          Sign In
+        </Link>
+      </div>
+
+      {/* Trust Badges - Spacing adjusted */}
+      <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-white/40">
+        <span className="flex items-center gap-2 font-medium">
+          <CheckCircle className="w-4 h-4 text-green-400/70" /> 
+          Free Forever
+        </span>
+        <span className="flex items-center gap-2 font-medium">
+          <CheckCircle className="w-4 h-4 text-green-400/70" /> 
+          No Credit Card
+        </span>
+        <span className="flex items-center gap-2 font-medium">
+          <CheckCircle className="w-4 h-4 text-green-400/70" /> 
+          Cancel Anytime
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
        <Footer />
     </div>
   );

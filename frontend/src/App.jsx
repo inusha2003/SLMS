@@ -12,7 +12,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProfileSetup from './pages/ProfileSetup';
 import AdminPanel from './pages/AdminPanel';
-import Planner from './Pages/Planner';
+
 const App = () => {
   const { loading } = useAuth();
   const { dark } = useTheme();
@@ -50,14 +50,7 @@ const App = () => {
                 <h1 className="text-7xl font-black text-gradient">404</h1>
                 <p className="mt-3 text-lg" style={{ color: 'var(--text-secondary)' }}>Page not found</p>
               </div>
-              <Route
-  path="/planner"
-  element={
-    <ProtectedRoute requireProfile>
-      <Planner />
-    </ProtectedRoute>
-  }
-/>
+    
             </div>
           } />
         </Routes>
