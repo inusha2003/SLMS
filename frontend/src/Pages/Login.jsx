@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, LogIn, GraduationCap } from 'lucide-react';
-import Spinner from '../components/Spinner';
+import Spinner from '../Components/Spinner';
 
 const Login = () => {
   const { login, isAuthenticated, user } = useAuth();
@@ -59,17 +59,12 @@ const Login = () => {
         </div>
 
         <div className="card">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" autoComplete="off">
-            {/* Hidden fields to prevent browser autofill (dummy username/password) */}
-            <input type="text" name="__hidden_username" autoComplete="username" style={{ display: 'none' }} />
-            <input type="password" name="__hidden_password" autoComplete="new-password" style={{ display: 'none' }} />
-
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Email Address</label>
               <input
                 type="email"
                 placeholder="you@example.com"
-                autoComplete="off"
                 className={`input-field ${errors.email ? 'input-error' : ''}`}
                 {...register('email', {
                   required: 'Email is required',
@@ -88,7 +83,6 @@ const Login = () => {
                 <input
                   type={showPw ? 'text' : 'password'}
                   placeholder="Enter your password"
-                  autoComplete="new-password"
                   className={`input-field pr-12 ${errors.password ? 'input-error' : ''}`}
                   {...register('password', {
                     required: 'Password is required',

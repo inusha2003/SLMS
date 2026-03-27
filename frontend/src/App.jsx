@@ -2,16 +2,16 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
-import { FullPageSpinner } from './components/Spinner';
+import { FullPageSpinner } from './Components/Spinner';
 import Navbar from './Components/layout/Navbar';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute';
+import ProtectedRoute from './Components/ProtectedRoute';
+import AdminRoute from './Components/AdminRoute';
 import Home from './Pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import ProfileSetup from './pages/ProfileSetup';
-import AdminPanel from './pages/AdminPanel';
+import Login from './Pages/Login';
+import Register from './Pages/Register';
+import Dashboard from './Pages/Dashboard';
+import ProfileSetup from './Pages/ProfileSetup';
+import AdminPanel from './Pages/AdminPanel';
 
 const App = () => {
   const { loading } = useAuth();

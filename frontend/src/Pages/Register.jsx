@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, UserPlus, GraduationCap } from 'lucide-react';
-import Spinner from '../components/Spinner';
+import Spinner from '../Components/Spinner';
 
 const Register = () => {
   const { register: registerUser, isAuthenticated } = useAuth();
@@ -145,6 +145,12 @@ const Register = () => {
             </button>
           </form>
 
+          <div className="mt-6 pt-6 border-t border-lms-primary/30 text-center">
+            <p className="text-sm text-gray-400">
+              Already have an account?{' '}
+              <Link to="/login" className="font-semibold text-lms-accent hover:underline">Sign In</Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

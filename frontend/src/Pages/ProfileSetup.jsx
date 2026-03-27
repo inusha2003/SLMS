@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import Spinner from '../components/Spinner';
+import Spinner from '../Components/Spinner';
 import { Save, User, GraduationCap, BookOpen, Award, Target, Sparkles } from 'lucide-react';
 
 const years = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
