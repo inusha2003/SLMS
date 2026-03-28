@@ -1,13 +1,84 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const multer = require("multer");
 
 const FlashcardDeck = require("../models/FlashcardDeckModel.jsx");
+const User = require("../models/UserModel.jsx");
 const {
   sendGenerateHelp,
   handleGeneratePost,
+  handleGenerateFromFilePost,
 } = require("../controllers/contentController.jsx");
+const {
+  SUPPORTED_UPLOAD_MIME_TYPES,
+} = require("../services/aiGenerateService.jsx");
+const { readBearerToken, verifyAuthToken } = require("../utils/authToken.js");
 
 const router = express.Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 20 * 1024 * 1024,
+  },
+    fileFilter: (req, file, cb) => {
+    if (!SUPPORTED_UPLOAD_MIME_TYPES.has(file.mimetype)) {
+      const err = new Error("Only PDF and PPTX files are supported.");
+      err.statusCode = 400;
+      cb(err);
+      return;
+    }
+    cb(null, true);
+  },
+});
+
+async function loadUserFromHeader(req) {
+  const bearerToken = readBearerToken(req);
+  if (bearerToken) {
+    const payload = verifyAuthToken(bearerToken);
+    if (payload?.sub && /^[a-fA-F0-9]{24}$/.test(payload.sub)) {
+      return User.findById(payload.sub).lean();
+    }
+    return null;
+  }
+
+  const userId = req.header("x-user-id");
+  if (!userId || !mongoose.isValidObjectId(userId)) return null;
+  return User.findById(userId).lean();
+}
+
+async function attachUser(req, res, next) {
+  try {
+    req.user = await loadUserFromHeader(req);
+    return next();
+  } catch (err) {
+    return res.status(500).json({ message: "Server error." });
+  }
+}
+
+function requireStudent(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Please log in to save flashcard decks." });
+  }
+  if (req.user.role !== "Student") {
+    return res.status(403).json({ message: "Student access only." });
+  }
+  return next();
+}
+
+function canStudentAccessSemester(studentSemesterValue, contentSemesterValue) {
+  const studentSemester = Number(studentSemesterValue);
+  const contentSemester = Number(contentSemesterValue);
+
+  if (!Number.isFinite(studentSemester) || !Number.isFinite(contentSemester)) {
+    return false;
+  }
+
+  if (studentSemester >= 7) {
+    return true;
+  }
+
+  return contentSemester <= studentSemester;
+}
 
 // Base content route
 router.get("/", (req, res) => {
@@ -21,21 +92,14 @@ router.get("/generate", sendGenerateHelp);
 
 // AI generate post
 router.post("/generate", handleGeneratePost);
+router.post("/generate-from-file", upload.single("lessonFile"), handleGenerateFromFilePost);
 
 /**
  * POST /api/content/flashcard-decks
- * Headers: x-user-id (Mongo ObjectId)
+ * Requires student auth
  */
-router.post("/flashcard-decks", async (req, res) => {
+router.post("/flashcard-decks", attachUser, requireStudent, async (req, res) => {
   try {
-    const userId = req.header("x-user-id");
-
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return res.status(401).json({
-        message: "Missing or invalid x-user-id header (Mongo ObjectId).",
-      });
-    }
-
     const {
       title,
       subject,
@@ -55,6 +119,12 @@ router.post("/flashcard-decks", async (req, res) => {
     if (!Number.isFinite(semNum) || semNum < 1) {
       return res.status(400).json({
         message: "Invalid semester.",
+      });
+    }
+
+    if (!canStudentAccessSemester(req.user?.semester, semNum)) {
+      return res.status(403).json({
+        message: "You cannot save flashcards for a semester beyond your registered semester.",
       });
     }
 
@@ -79,7 +149,7 @@ router.post("/flashcard-decks", async (req, res) => {
       title: String(title).trim(),
       subject: String(subject).trim(),
       semester: semNum,
-      createdBy: userId,
+      createdBy: req.user._id,
       cards: sanitized,
       isAiGenerated: Boolean(isAiGenerated),
     });

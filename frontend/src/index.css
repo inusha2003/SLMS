@@ -1,14 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Segoe UI", "Trebuchet MS", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color-scheme: dark;
+  color: rgba(244, 247, 251, 0.96);
+  --slms-bg: #07111f;
+  --slms-bg-soft: #0d1728;
+  --slms-panel: rgba(12, 23, 39, 0.84);
+  --slms-panel-strong: rgba(8, 18, 32, 0.92);
+  --slms-border: rgba(148, 163, 184, 0.16);
+  --slms-text-muted: #8fa7c2;
+  --slms-accent: #4fd1c5;
+  --slms-accent-strong: #22c55e;
+  --slms-highlight: #fb923c;
+  background:
+    radial-gradient(circle at top left, rgba(79, 209, 197, 0.16), transparent 26%),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 24%),
+    radial-gradient(circle at 50% 120%, rgba(14, 165, 233, 0.12), transparent 34%),
+    linear-gradient(180deg, #07111f 0%, #091522 45%, #050b16 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,57 +28,307 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: inherit;
   text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(79, 209, 197, 0.16), transparent 26%),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 24%),
+    radial-gradient(circle at 50% 120%, rgba(14, 165, 233, 0.12), transparent 34%),
+    linear-gradient(180deg, #07111f 0%, #091522 45%, #050b16 100%);
 }
 
 html,
 body,
 #root {
   height: 100%;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  background: #07111f;
 }
 
 button {
-  border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition:
+    border-color 0.25s,
+    transform 0.2s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+button:focus,
+button:focus-visible {
+  outline: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.3;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black 45%, transparent 90%);
+}
+
+.slms-shell {
+  background:
+    radial-gradient(circle at top left, rgba(79, 209, 197, 0.08), transparent 24%),
+    radial-gradient(circle at right top, rgba(251, 146, 60, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(6, 14, 25, 0.98), rgba(4, 10, 20, 0.98));
+}
+
+.slms-page {
+  position: relative;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top right, rgba(79, 209, 197, 0.09), transparent 22%),
+    radial-gradient(circle at left bottom, rgba(14, 165, 233, 0.08), transparent 24%);
+}
+
+.slms-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%);
+}
+
+.slms-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+.slms-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.slms-hero::before,
+.slms-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(14px);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.slms-hero::before {
+  top: -80px;
+  right: 6%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(79, 209, 197, 0.28), transparent 68%);
+  animation: slmsFloat 14s ease-in-out infinite;
+}
+
+.slms-hero::after {
+  bottom: -90px;
+  left: 10%;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.2), transparent 70%);
+  animation: slmsFloat 18s ease-in-out infinite reverse;
+}
+
+.slms-card {
+  background: linear-gradient(180deg, rgba(15, 27, 45, 0.92), rgba(8, 17, 30, 0.94));
+  border: 1px solid var(--slms-border);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(14px);
+}
+
+.slms-card-soft {
+  background: linear-gradient(180deg, rgba(14, 24, 40, 0.82), rgba(8, 16, 28, 0.86));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.slms-input {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(10, 22, 38, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.slms-input:focus {
+  border-color: rgba(79, 209, 197, 0.65);
+  box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.12);
+}
+
+.slms-primary-btn {
+  background-image: linear-gradient(135deg, #14b8a6, #0ea5e9 55%, #fb923c);
+  box-shadow: 0 18px 40px rgba(14, 165, 233, 0.22);
+}
+
+.slms-primary-btn:hover {
+  filter: brightness(1.06);
+}
+
+.slms-glow-ring {
+  position: relative;
+}
+
+.slms-glow-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(79, 209, 197, 0.4), rgba(14, 165, 233, 0.18), rgba(251, 146, 60, 0.3));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.slms-muted {
+  color: var(--slms-text-muted);
+}
+
+.slms-section-title {
+  letter-spacing: -0.04em;
+  color: white;
+}
+
+.slms-fade-up {
+  animation: slmsFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.slms-fade-in {
+  animation: slmsFadeIn 0.8s ease both;
+}
+
+.slms-stagger-1 {
+  animation-delay: 0.08s;
+}
+
+.slms-stagger-2 {
+  animation-delay: 0.16s;
+}
+
+.slms-stagger-3 {
+  animation-delay: 0.24s;
+}
+
+.slms-hover-lift {
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.slms-hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.3);
+}
+
+.slms-chip {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(12px);
+}
+
+.slms-animated-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at center, black 38%, transparent 82%);
+}
+
+.slms-flip-scene {
+  perspective: 1600px;
+}
+
+.slms-flip-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slms-flip-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.slms-flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.slms-flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+@keyframes slmsFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
   }
-  a:hover {
-    color: #747bff;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+@keyframes slmsFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slmsFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, 18px, 0) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slms-fade-up,
+  .slms-fade-in,
+  .slms-hero::before,
+  .slms-hero::after {
+    animation: none;
+  }
+
+  .slms-hover-lift,
+  .slms-hover-lift:hover {
+    transition: none;
+    transform: none;
+  }
+
+  .slms-flip-card,
+  .slms-flip-card.is-flipped {
+    transition: none;
+    transform: none;
+  }
+
+  .slms-flip-back {
+    position: static;
+    transform: none;
   }
 }

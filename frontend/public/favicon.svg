@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SLMS favicon">
+  <defs>
+    <linearGradient id="slmsGradient" x1="12" y1="10" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22d3ee" />
+      <stop offset="0.55" stop-color="#38bdf8" />
+      <stop offset="1" stop-color="#fb923c" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#07111f" />
+  <rect x="6" y="6" width="52" height="52" rx="16" fill="url(#slmsGradient)" />
+  <path
+    fill="#04101d"
+    d="M21.1 22.5c0-2 1.6-3.6 3.6-3.6h10.9v4.9h-9.2v4.4h8.4V33h-8.4v7.9h-5.3V22.5Zm17.4-3.6h5.3V36h10.3v4.9H38.5V18.9Z"
+  />
+</svg>
