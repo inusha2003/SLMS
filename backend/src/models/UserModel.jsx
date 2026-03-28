@@ -17,8 +17,20 @@ const userSchema = new Schema(
     },
     password: { type: String, required: true, minlength: 6 },
     role: { type: String, enum: ["Student", "Admin"], required: true },
-    semester: { type: Number, required: true, min: 1 },
-    faculty: { type: String, required: true, trim: true },
+    semester: {
+      type: Number,
+      min: 1,
+      required: function requiredSemester() {
+        return this.role === "Student";
+      },
+    },
+    faculty: {
+      type: String,
+      trim: true,
+      required: function requiredFaculty() {
+        return this.role === "Student";
+      },
+    },
   },
   { timestamps: true }
 );

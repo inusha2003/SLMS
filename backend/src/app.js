@@ -5,6 +5,7 @@ const contentRoutes = require("./routes/contentRoutes.jsx");
 const assessmentRoutes = require("./routes/assessmentRoutes.jsx");
 const flashcardRoutes = require("./routes/flashcardRoutes.jsx");
 const mcqBankRoutes = require("./routes/mcqBankRoutes.jsx");
+const authRoutes = require("./routes/authRoutes.jsx");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/health", (req, res) => {
 app.use("/api/content", contentRoutes);
 app.use("/api/assessment", assessmentRoutes);
 app.use("/api/flashcards", flashcardRoutes);
+app.use("/api/auth", authRoutes);
 
 // MCQ bank: app-level GET so /api/mcq-bank always matches (Express 5 + Postman/browser)
 app.get("/api/mcq-bank", mcqBankRoutes.listUpcomingMcqSets);
@@ -43,10 +45,16 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Global Error:", err);
 
-  const statusCode = err.statusCode || err.status || 500;
+  const statusCode =
+    err.code === "LIMIT_FILE_SIZE"
+      ? 400
+      : err.statusCode || err.status || 500;
 
   res.status(statusCode).json({
-    message: err.message || "Internal server error",
+    message:
+      err.code === "LIMIT_FILE_SIZE"
+        ? "Uploaded file is too large. Maximum size is 20MB."
+        : err.message || "Internal server error",
   });
 });
 

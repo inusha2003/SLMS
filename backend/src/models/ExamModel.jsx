@@ -21,6 +21,12 @@ const examQuestionSchema = new Schema(
 
 const examSchema = new Schema(
   {
+    kind: {
+      type: String,
+      enum: ["exam", "mcq_bank"],
+      required: true,
+      default: "exam",
+    },
     title: { type: String, required: true, trim: true },
     subject: { type: String, required: true, trim: true },
     semester: { type: Number, required: true, min: 1 },
@@ -43,4 +49,3 @@ const examSchema = new Schema(
 );
 
 module.exports = mongoose.model("Exam", examSchema);
-
