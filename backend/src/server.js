@@ -1,35 +1,34 @@
-const dotenv = require("dotenv");
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+
 dotenv.config();
 
-const mongoose = require("mongoose");
-const app = require("./app");
-
-async function connectDatabase() {
-  const uri = process.env.MONGODB_URI;
-
-  if (!uri) {
-    console.warn("MONGODB_URI is not set. Database connection skipped.");
-    return;
-  }
-
-  await mongoose.connect(uri);
-  console.log("Connected to MongoDB");
-}
-
+const app = express();
 const PORT = process.env.PORT || 5000;
 
-connectDatabase()
-  .then(() => {
-    app.listen(PORT, () => {
-      const base = `http://localhost:${PORT}`;
-      console.log(`Server is running on port ${PORT}`);
-      console.log(`GET  ${base}/health`);
-      console.log(`GET  ${base}/api/content`);
-      console.log(`GET  ${base}/api/content/generate`);
-      console.log(`POST ${base}/api/content/generate`);
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to start server:", err);
-    process.exit(1);
-  });
+connectDB();
+
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/admin', adminRoutes);
+
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'OK', message: 'Smart LMS API is running' });
+});
+
+app.use((err, _req, res, _next) => {
+  console.error('Server Error:', err.stack);
+  res.status(500).json({ message: 'Internal server error' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
