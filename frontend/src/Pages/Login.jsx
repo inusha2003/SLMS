@@ -41,7 +41,9 @@ const Login = () => {
       else if (!loggedUser.isProfileComplete) navigate('/profile-setup');
       else navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      const d = err.response?.data;
+      const detail = [d?.message, d?.error].filter(Boolean).join(' — ');
+      toast.error(detail || err.message || 'Login failed');
     } finally {
       setSubmitting(false);
     }

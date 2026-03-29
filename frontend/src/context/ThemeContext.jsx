@@ -12,15 +12,18 @@ export const ThemeProvider = ({ children }) => {
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('lms_theme');
     if (saved) return saved === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Default to dark mode
+    return true;
   });
 
   useEffect(() => {
     localStorage.setItem('lms_theme', dark ? 'dark' : 'light');
     if (dark) {
       document.documentElement.classList.add('dark');
+      console.log('[Theme] Dark mode enabled');
     } else {
       document.documentElement.classList.remove('dark');
+      console.log('[Theme] Light mode enabled');
     }
   }, [dark]);
 

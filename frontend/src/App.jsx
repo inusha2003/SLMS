@@ -1,21 +1,5 @@
-import { Route, Routes, useLocation, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import "./App.css";
-import Sidebar from "./Components/Sidebar.jsx";
-import AiContentGenerator from "./Components/AiContentGenerator.jsx";
-import DashboardPage from "./Pages/DashboardPage.jsx";
-import FlashcardDecksPage from "./Pages/FlashcardDecksPage.jsx";
-import FlashcardStudyPage from "./Pages/FlashcardStudyPage.jsx";
-import McqBankPage from "./Pages/McqBankPage.jsx";
-import McqBankStudyPage from "./Pages/McqBankStudyPage.jsx";
-import ExamInterfacePage from "./Pages/ExamInterfacePage.jsx";
-import ExamSchedulePage from "./Pages/ExamSchedulePage.jsx";
-import ExamResultPage from "./Pages/ExamResultPage.jsx";
-import AdminCreateExamPage from "./Pages/AdminCreateExamPage.jsx";
-import PerformancePage from "./Pages/PerformancePage.jsx";
-import LoginPage from "./Pages/LoginPage.jsx";
-import RegisterPage from "./Pages/RegisterPage.jsx";
-import { isAdminLoggedIn } from "./lib/session.js";
-import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
@@ -29,11 +13,13 @@ import Register from './Pages/Register';
 import Dashboard from './Pages/Dashboard';
 import ProfileSetup from './Pages/ProfileSetup';
 import AdminPanel from './Pages/AdminPanel';
-
-const App = () => {
-  const { loading } = useAuth();
-  const { dark } = useTheme();
-  if (loading) return <FullPageSpinner />;
+import AdminCreateExamPage from './Pages/AdminCreateExamPage.jsx';
+import { isAdminLoggedIn } from "./lib/session.js";
+import StudentHubLayout from './studentPerformance/StudentHubLayout.jsx';
+import StudentPerformanceDashboard from './studentPerformance/StudentPerformanceDashboard.jsx';
+import StudentCalendarPage from './studentPerformance/StudentCalendarPage.jsx';
+import StudentNotificationsPage from './studentPerformance/StudentNotificationsPage.jsx';
+import StudentGoalsPage from './studentPerformance/StudentGoalsPage.jsx';
 
 function AccessOnlyCard({ title, description }) {
   return (
@@ -92,44 +78,11 @@ function AdminOnlyCreateMcqBankRoute() {
   return <AdminCreateExamPage initialKind="mcq_bank" lockedKind />;
 }
 
-function App() {
-  const location = useLocation();
-  const active = pathToActiveKey(location.pathname);
-  const hideSidebar =
-    location.pathname === "/login" || location.pathname === "/register";
+const App = () => {
+  const { loading } = useAuth();
+  const { dark } = useTheme();
+  if (loading) return <FullPageSpinner />;
 
-  return (
-    <div className="slms-shell flex h-screen overflow-hidden">
-      {!hideSidebar && <Sidebar active={active} />}
-      <main className="h-screen flex-1 overflow-y-auto">
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/ai-tools" element={<AiContentGenerator />} />
-          <Route
-            path="/performance"
-            element={<PerformancePage />}
-          />
-          <Route path="/mcq-bank" element={<McqBankPage />} />
-          <Route path="/mcq-bank/create" element={<AdminOnlyCreateMcqBankRoute />} />
-          <Route path="/mcq-bank/:examId" element={<McqBankStudyPage />} />
-          <Route path="/flashcards" element={<FlashcardDecksPage />} />
-          <Route path="/flashcards/study/:deckId" element={<FlashcardStudyPage />} />
-          <Route path="/exam/:examId/result" element={<ExamResultPage />} />
-          <Route path="/exam/:examId" element={<ExamInterfacePage />} />
-          <Route path="/exams" element={<ExamSchedulePage />} />
-          <Route path="/exams/create" element={<AdminOnlyCreateRoute />} />
-          <Route path="/exams/:examId/edit" element={<AdminOnlyEditRoute />} />
-          <Route
-            path="*"
-            element={
-              <AccessOnlyCard
-                title="Not Found"
-                description="The page you tried to open is not available in this workspace."
-              />
-            }
-          />
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-body)' }}>
       <Toaster
@@ -155,6 +108,18 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute requireProfile><Dashboard /></ProtectedRoute>} />
+          <Route path="/performance" element={<StudentHubLayout hubBase="/performance" />}>
+            <Route index element={<StudentPerformanceDashboard />} />
+            <Route path="calendar" element={<StudentCalendarPage />} />
+            <Route path="notifications" element={<StudentNotificationsPage />} />
+            <Route path="goals" element={<StudentGoalsPage />} />
+          </Route>
+          <Route path="/u" element={<StudentHubLayout hubBase="/u" />}>
+            <Route index element={<Navigate to="/performance" replace />} />
+            <Route path="calendar" element={<StudentCalendarPage />} />
+            <Route path="notifications" element={<StudentNotificationsPage />} />
+            <Route path="goals" element={<StudentGoalsPage />} />
+          </Route>
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           <Route path="*" element={
             <div className="flex items-center justify-center min-h-[60vh]">
@@ -162,7 +127,6 @@ function App() {
                 <h1 className="text-7xl font-black text-gradient">404</h1>
                 <p className="mt-3 text-lg" style={{ color: 'var(--text-secondary)' }}>Page not found</p>
               </div>
-    
             </div>
           } />
         </Routes>
