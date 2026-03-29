@@ -582,6 +582,8 @@ body::before {
     position: static;
     transform: none;
   }
+}
+
 /* ═══════ BUTTONS ═══════ */
 .btn-hero-primary {
   display: inline-flex;

@@ -1,23 +1,35 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-const signToken = (userId, role) =>
-  jwt.sign({ userId, role }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
+function getJwtSignOptions() {
+  const secret = String(process.env.JWT_SECRET ?? '').trim();
+  const expiresIn = String(process.env.JWT_EXPIRE ?? '7d').trim();
+  if (!secret) {
+    throw new Error('JWT_SECRET is not configured');
+  }
+  return { secret, expiresIn };
+}
 
-const sanitizeUser = (u) => ({
-  id: u._id,
-  firstName: u.firstName,
-  lastName: u.lastName,
-  email: u.email,
-  role: u.role,
-  academicYear: u.academicYear,
-  semester: u.semester,
-  isProfileComplete: u.isProfileComplete,
-  isActive: u.isActive,
-  createdAt: u.createdAt,
-});
+const signToken = (userId, role) => {
+  const { secret, expiresIn } = getJwtSignOptions();
+  return jwt.sign({ userId: String(userId), role }, secret, { expiresIn });
+};
+
+const sanitizeUser = (u) => {
+  const x = typeof u?.toObject === 'function' ? u.toObject() : u;
+  return {
+    id: x._id != null ? String(x._id) : null,
+    firstName: x.firstName ?? '',
+    lastName: x.lastName ?? '',
+    email: x.email ?? '',
+    role: x.role ?? 'Student',
+    academicYear: x.academicYear ?? '',
+    semester: x.semester ?? '',
+    isProfileComplete: Boolean(x.isProfileComplete),
+    isActive: x.isActive !== false,
+    createdAt: x.createdAt ? new Date(x.createdAt).toISOString() : null,
+  };
+};
 
 export const register = async (req, res) => {
   try {
@@ -76,7 +88,13 @@ export const login = async (req, res) => {
       return res.status(403).json({ message: 'Account deactivated. Contact administrator.' });
     }
 
-    const isMatch = await user.comparePassword(password);
+    let isMatch = false;
+    try {
+      isMatch = await user.comparePassword(String(password));
+    } catch (e) {
+      console.error('Password compare error:', e.message);
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
     console.log('Password match:', isMatch);
 
     if (!isMatch) {

@@ -16,7 +16,11 @@ export const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = String(process.env.JWT_SECRET ?? '').trim();
+    if (!secret) {
+      return res.status(500).json({ message: 'Server misconfiguration' });
+    }
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.userId);
 
     if (!user) {

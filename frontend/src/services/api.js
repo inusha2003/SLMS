@@ -1,7 +1,14 @@
 import axios from 'axios';
+import { API_BASE } from '../lib/api.js';
+
+// Match `lib/api.js`: when VITE_API_URL is unset, call backend directly on :5000 (avoids relying on Vite proxy).
+const baseURL =
+  !API_BASE || API_BASE === ''
+    ? '/api'
+    : `${String(API_BASE).replace(/\/+$/, '')}/api`;
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   headers: { 'Content-Type': 'application/json' },
 });
 
