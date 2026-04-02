@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/MAuthContext';
+import { useTheme } from '../../context/MThemeContext';
 import { Menu, X, LogOut, LayoutDashboard, Shield, User, GraduationCap, Sun, Moon } from 'lucide-react';
 
 const ThemeToggle = () => {

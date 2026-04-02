@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Footer from '../Components/layout/Footer';
+import Footer from '../Components/layout/MFooter';
 import { useEffect, useState, useRef } from 'react';
 import {
   BookOpen, BarChart3, Users, Shield, Clock, GraduationCap,

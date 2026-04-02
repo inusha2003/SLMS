@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/MAuthContext';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, UserPlus, GraduationCap } from 'lucide-react';
-import Spinner from '../Components/Spinner';
+import Spinner from '../Components/MSpinner';
 
 const Register = () => {
   const { register: registerUser, isAuthenticated } = useAuth();

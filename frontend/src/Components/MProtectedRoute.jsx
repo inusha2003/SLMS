@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { FullPageSpinner } from './Spinner';
+import { useAuth } from '../context/MAuthContext';
+import { FullPageSpinner } from './MSpinner';
 
 const ProtectedRoute = ({ children, requireProfile = false }) => {
   const { user, loading, isAuthenticated } = useAuth();
