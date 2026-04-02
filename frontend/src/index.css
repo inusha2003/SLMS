@@ -1,9 +1,6 @@
 @import "tailwindcss";
 
-/* 1. සියලුම Imports ඉහළින්ම තිබිය යුතුයි */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-/* 2. Theme Configuration (Custom Colors මෙතනට තමයි එන්නේ) */
+@layer {}
 @theme {
   --font-inter: "Inter", system-ui, sans-serif;
 
@@ -115,37 +112,9 @@
 
   .error-text {
     @apply text-xs text-red-400 mt-1;
-:root {
-  font-family: "Segoe UI", "Trebuchet MS", sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: dark;
-  color: rgba(244, 247, 251, 0.96);
-  --slms-bg: #07111f;
-  --slms-bg-soft: #0d1728;
-  --slms-panel: rgba(12, 23, 39, 0.84);
-  --slms-panel-strong: rgba(8, 18, 32, 0.92);
-  --slms-border: rgba(148, 163, 184, 0.16);
-  --slms-text-muted: #8fa7c2;
-  --slms-accent: #4fd1c5;
-  --slms-accent-strong: #22c55e;
-  --slms-highlight: #fb923c;
-  background:
-    radial-gradient(circle at top left, rgba(79, 209, 197, 0.16), transparent 26%),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 24%),
-    radial-gradient(circle at 50% 120%, rgba(14, 165, 233, 0.12), transparent 34%),
-    linear-gradient(180deg, #07111f 0%, #091522 45%, #050b16 100%);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-a {
-  font-weight: 500;
-  color: inherit;
-  text-decoration: inherit;
-}
 @theme {
   --color-lms-darkest: #0f172a;
   --color-lms-dark: #1e293b;
