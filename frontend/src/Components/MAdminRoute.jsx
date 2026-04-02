@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { FullPageSpinner } from './Spinner';
+import { useAuth } from '../context/MAuthContext';
+import { FullPageSpinner } from './MSpinner';
 
 const AdminRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();

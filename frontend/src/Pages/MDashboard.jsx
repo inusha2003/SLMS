@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/MAuthContext';
 import {
   TrendingUp,
+  Calendar,
   GraduationCap,
   Award,
   Settings,
@@ -46,7 +47,8 @@ const Dashboard = () => {
   const quickActions = [
     { title: 'Study Notes', desc: 'Browse & Upload Notes', icon: FileText, color: 'from-blue-500 to-blue-600', link: '/notes' },
     { title: 'AI Assistant', desc: 'PDF Summaries & MCQs', icon: Cpu, color: 'from-violet-500 to-purple-600', link: '/ai-tools' },
-    { title: 'My Performance', desc: 'Student hub — analytics & charts', icon: TrendingUp, color: 'from-emerald-500 to-teal-600', link: '/performance' },
+    { title: 'My Performance', desc: 'Analytics & Charts', icon: TrendingUp, color: 'from-emerald-500 to-teal-600', link: '/analytics' },
+    { title: 'Academic Calendar', desc: 'Events & Deadlines', icon: Calendar, color: 'from-amber-500 to-orange-600', link: '/calendar' },
   ];
 
   // Demo tasks with createdAt
@@ -250,7 +252,7 @@ const Dashboard = () => {
             <div className="card" style={{ borderColor: 'rgba(99,102,241,0.12)', overflow: 'hidden', background: 'linear-gradient(180deg, rgba(99,102,241,0.06), rgba(139,92,246,0.04))', backdropFilter: 'blur(8px)', border: '1px solid rgba(99,102,241,0.06)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                 <h4 style={{ fontSize: '0.875rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}><CheckSquare style={{ color: '#6ee7b7' }} /> Personal Study Planner</h4>
-                <button onClick={() => { resetModal(); setShowModal(true); }} style={{ padding: '0.5rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 700, background: `linear-gradient(90deg, ${themeAccent}, ${themeDark})`, color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(32,21,43,0.35)' }}><Plus style={{ width: 14, height: 14 }} /> Add Task</button>
+                <button onClick={() => navigate('/planner')} style={{ padding: '0.5rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 700, background: 'linear-gradient(90deg, var(--color-lms-accent), var(--color-lms-primary))', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(59,130,246,0.18)' }}><Plus style={{ width: 14, height: 14 }} /> Add Task</button>
               </div>
 
               {/* Tasks */}

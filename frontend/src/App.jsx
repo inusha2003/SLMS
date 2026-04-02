@@ -78,6 +78,19 @@ function AdminOnlyCreateMcqBankRoute() {
 
   return <AdminCreateExamPage initialKind="mcq_bank" lockedKind />;
 }
+import { useAuth } from './context/MAuthContext';
+import { useTheme } from './context/MThemeContext';
+import { FullPageSpinner } from './Components/MSpinner';
+import Navbar from './Components/layout/MNavbar';
+import ProtectedRoute from './Components/MProtectedRoute';
+import AdminRoute from './Components/MAdminRoute';
+import Home from './Pages/MHome';
+import Login from './Pages/MLogin';
+import Register from './Pages/MRegister';
+import Dashboard from './Pages/MDashboard';
+import ProfileSetup from './Pages/MProfileSetup';
+import AdminPanel from './Pages/MAdminPanel';
+import Planner from './Pages/Planner';
 
 const App = () => {
   const { loading } = useAuth();
@@ -124,6 +137,7 @@ const App = () => {
             <Route path="goals" element={<StudentGoalsPage />} />
           </Route>
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
           <Route path="*" element={
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center">

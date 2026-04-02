@@ -16,7 +16,7 @@ import moderationRoutes from './routes/moderationRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-import assessmentPerformanceRoutes from './routes/assessmentPerformanceRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 
 dotenv.config();
 
@@ -79,16 +79,15 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/assessment', assessmentPerformanceRoutes);
+app.use('/api/tasks', taskRoutes);
 
-app.use('/api/notes', noteRoutes);
-app.use('/api/notes/:noteId/comments', commentRoutes);
-app.use('/api/qa', qaRoutes);
-app.use('/api/moderation', moderationRoutes);
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'OK', message: 'Smart LMS API is running' });
+});
 
-// Health
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK' });
+app.use((err, _req, res, _next) => {
+  console.error('Server Error:', err.stack);
+  res.status(500).json({ message: 'Internal server error' });
 });
 
 // Start

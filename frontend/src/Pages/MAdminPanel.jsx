@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import Spinner from '../Components/Spinner';
+import Spinner from '../Components/MSpinner';
 import {
   Search,
   Users,

@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext.jsx';
-import { AuthProvider } from './context/AuthContext.jsx';
-import { TaskProvider } from './context/TaskContext.jsx';
+import { AuthProvider } from './context/MAuthContext.jsx';
+import { ThemeProvider } from './context/MThemeContext.jsx';
+import { TaskProvider } from './context/MTaskContext.jsx';
 import App from './App.jsx';
 import './index.css';
 
