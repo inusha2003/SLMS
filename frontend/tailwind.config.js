@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     './index.html',
@@ -21,6 +20,9 @@ export default {
         'lms-teal': '#14b8a6',
         'lms-rose': '#f43f5e',
         'lms-amber': '#f59e0b',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -125,4 +127,4 @@ export default {
   },
   plugins: [],
   darkMode: 'class',
-}
+};
