@@ -22,6 +22,9 @@ export function loadNotifications(userKey) {
 
 export function saveNotifications(userKey, items) {
   localStorage.setItem(storageKey(userKey), JSON.stringify(items));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("slms-student-notifications-changed"));
+  }
 }
 
 function demoSeedFlag(userKey) {
