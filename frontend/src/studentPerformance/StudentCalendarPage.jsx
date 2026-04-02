@@ -9,7 +9,7 @@ import {
   Bell,
   X,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/MAuthContext";
 import {
   getCalendarUserKey,
   loadCalendarEvents,

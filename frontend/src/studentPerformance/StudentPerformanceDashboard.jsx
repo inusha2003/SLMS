@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { apiUrl } from "../lib/api.js";
 import { getAuthHeaders, getAuthToken } from "../lib/session.js";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/MAuthContext";
 import { getCalendarUserKey } from "./calendarStorage.js";
 
 const MANUAL_GPA_STORAGE = "slms_performance_manual_gpa_v1";

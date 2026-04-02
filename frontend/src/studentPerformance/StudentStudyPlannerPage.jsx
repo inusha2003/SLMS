@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Brain, CalendarClock, ListChecks, Sparkles } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/MAuthContext";
 import { apiUrl } from "../lib/api.js";
 import { getAuthHeaders, getAuthToken } from "../lib/session.js";
 import { getCalendarUserKey, loadCalendarEvents } from "./calendarStorage.js";

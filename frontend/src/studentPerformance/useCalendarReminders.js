@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/MAuthContext";
 import {
   appendNotification,
   getNotificationsUserKey,
