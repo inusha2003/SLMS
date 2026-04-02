@@ -20,6 +20,7 @@ import StudentPerformanceDashboard from './studentPerformance/StudentPerformance
 import StudentCalendarPage from './studentPerformance/StudentCalendarPage.jsx';
 import StudentNotificationsPage from './studentPerformance/StudentNotificationsPage.jsx';
 import StudentGoalsPage from './studentPerformance/StudentGoalsPage.jsx';
+import StudentStudyPlannerPage from './studentPerformance/StudentStudyPlannerPage.jsx';
 
 function AccessOnlyCard({ title, description }) {
   return (
@@ -111,12 +112,14 @@ const App = () => {
           <Route path="/performance" element={<StudentHubLayout hubBase="/performance" />}>
             <Route index element={<StudentPerformanceDashboard />} />
             <Route path="calendar" element={<StudentCalendarPage />} />
+            <Route path="planner" element={<StudentStudyPlannerPage />} />
             <Route path="notifications" element={<StudentNotificationsPage />} />
             <Route path="goals" element={<StudentGoalsPage />} />
           </Route>
           <Route path="/u" element={<StudentHubLayout hubBase="/u" />}>
             <Route index element={<Navigate to="/performance" replace />} />
             <Route path="calendar" element={<StudentCalendarPage />} />
+            <Route path="planner" element={<StudentStudyPlannerPage />} />
             <Route path="notifications" element={<StudentNotificationsPage />} />
             <Route path="goals" element={<StudentGoalsPage />} />
           </Route>

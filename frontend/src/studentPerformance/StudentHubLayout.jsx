@@ -1,15 +1,56 @@
+import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import {
   BarChart3,
   Calendar,
   Bell,
   Target,
+  Sparkles,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import {
+  getNotificationsUserKey,
+  loadNotifications,
+} from "./notificationsStorage.js";
+
+/** Keep in sync with `notificationsStorage.js` STORAGE_PREFIX. */
+const NOTIFICATIONS_LS_PREFIX = "slms_student_notifications_v1";
 
 export default function StudentHubLayout({ hubBase = "/performance" }) {
+  const { user } = useAuth();
+  const userKey = useMemo(
+    () => getNotificationsUserKey(user?.id, user?.email),
+    [user?.id, user?.email],
+  );
+  const [notifUnread, setNotifUnread] = useState(0);
+
+  useEffect(() => {
+    const notifKey = `${NOTIFICATIONS_LS_PREFIX}_${userKey}`;
+    const sync = () => {
+      const list = loadNotifications(userKey);
+      setNotifUnread(list.filter((n) => !n.read).length);
+    };
+    sync();
+    const onStorage = (e) => {
+      if (e.key === notifKey) sync();
+    };
+    const onInbox = () => sync();
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("slms-student-notifications-changed", onInbox);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("slms-student-notifications-changed", onInbox);
+    };
+  }, [userKey]);
   const nav = [
     { to: "/performance", end: true, label: "Performance", Icon: BarChart3 },
     { to: `${hubBase}/calendar`, end: true, label: "Calendar", Icon: Calendar },
+    {
+      to: `${hubBase}/planner`,
+      end: true,
+      label: "Study planner",
+      Icon: Sparkles,
+    },
     {
       to: `${hubBase}/notifications`,
       end: true,
@@ -55,7 +96,30 @@ export default function StudentHubLayout({ hubBase = "/performance" }) {
         </nav>
       </aside>
 
-      <div className="min-w-0 flex-1 overflow-auto">
+      <div className="flex min-w-0 flex-1 flex-col overflow-auto">
+        <div className="sticky top-0 z-20 flex items-center justify-end border-b border-white/[0.06] bg-[#0a0f1a]/95 px-4 py-3 backdrop-blur-md sm:px-6">
+          <NavLink
+            to={`${hubBase}/notifications`}
+            className={({ isActive }) =>
+              [
+                "relative inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "border-violet-500/40 bg-violet-500/15 text-violet-100"
+                  : "border-white/10 bg-white/[0.04] text-slate-200 hover:bg-white/[0.08]",
+              ].join(" ")
+            }
+          >
+            <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.06]">
+              <Bell className="h-4 w-4" aria-hidden />
+              {notifUnread > 0 ? (
+                <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-violet-500 px-1 text-[10px] font-bold leading-none text-white">
+                  {notifUnread > 99 ? "99+" : notifUnread}
+                </span>
+              ) : null}
+            </span>
+            <span className="pr-0.5">Notifications</span>
+          </NavLink>
+        </div>
         <Outlet />
       </div>
     </div>
