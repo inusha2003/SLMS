@@ -1,9 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const jwt = require("jsonwebtoken");
 
 const FlashcardDeck = require("../models/FlashcardDeckModel.jsx");
-const User = require("../models/UserModel.jsx");
 const {
   sendGenerateHelp,
   handleGeneratePost,
@@ -12,7 +12,6 @@ const {
 const {
   SUPPORTED_UPLOAD_MIME_TYPES,
 } = require("../services/aiGenerateService.jsx");
-const { readBearerToken, verifyAuthToken } = require("../utils/authToken.js");
 
 const router = express.Router();
 const upload = multer({
@@ -31,18 +30,33 @@ const upload = multer({
   },
 });
 
+async function loadMainUserModel() {
+  return (await import("../models/User.js")).default;
+}
+
 async function loadUserFromHeader(req) {
-  const bearerToken = readBearerToken(req);
-  if (bearerToken) {
-    const payload = verifyAuthToken(bearerToken);
-    if (payload?.sub && /^[a-fA-F0-9]{24}$/.test(payload.sub)) {
-      return User.findById(payload.sub).lean();
+  const header = req.header("authorization") || req.header("Authorization") || "";
+  const match = String(header).match(/^Bearer\s+(.+)$/i);
+  const token = match ? match[1].trim() : "";
+  if (token) {
+    const secret = String(process.env.JWT_SECRET || "").trim();
+    if (!secret) return null;
+    try {
+      const payload = jwt.verify(token, secret);
+      const userId = payload?.userId || payload?.sub;
+      if (userId && /^[a-fA-F0-9]{24}$/.test(String(userId))) {
+        const User = await loadMainUserModel();
+        return User.findById(userId).lean();
+      }
+      return null;
+    } catch {
+      return null;
     }
-    return null;
   }
 
   const userId = req.header("x-user-id");
   if (!userId || !mongoose.isValidObjectId(userId)) return null;
+  const User = await loadMainUserModel();
   return User.findById(userId).lean();
 }
 

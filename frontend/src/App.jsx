@@ -1,62 +1,204 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import "./App.css";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
-import { useAuth } from './context/MAuthContext';
-import { useTheme } from './context/MThemeContext';
+import { useAuth } from "./context/MAuthContext";
+import { useTheme } from "./context/MThemeContext";
 
-import { FullPageSpinner } from './Components/MSpinner';
-import Navbar from './Components/layout/MNavbar';
-import ProtectedRoute from './Components/MProtectedRoute';
-import AdminRoute from './Components/MAdminRoute';
-import Home from './Pages/MHome';
-import Login from './Pages/MLogin';
-import Register from './Pages/MRegister';
-import Dashboard from './Pages/MDashboard';
-import ProfileSetup from './Pages/MProfileSetup';
-import AdminPanel from './Pages/MAdminPanel';
-import AdminCreateExamPage from './Pages/AdminCreateExamPage.jsx';
-import Planner from './Pages/Planner';
+import { FullPageSpinner } from "./Components/MSpinner";
+import Navbar from "./Components/layout/MNavbar";
+import ProtectedRoute from "./Components/MProtectedRoute";
+import AdminRoute from "./Components/MAdminRoute";
 
-import StudentHubLayout from './studentPerformance/StudentHubLayout.jsx';
-import StudentPerformanceDashboard from './studentPerformance/StudentPerformanceDashboard.jsx';
-import StudentCalendarPage from './studentPerformance/StudentCalendarPage.jsx';
-import StudentNotificationsPage from './studentPerformance/StudentNotificationsPage.jsx';
-import StudentGoalsPage from './studentPerformance/StudentGoalsPage.jsx';
-import StudentStudyPlannerPage from './studentPerformance/StudentStudyPlannerPage.jsx';
+import Home from "./Pages/MHome";
+import Login from "./Pages/MLogin";
+import Register from "./Pages/MRegister";
+import Dashboard from "./Pages/MDashboard";
+import AiWorkspaceDashboard from "./Pages/DashboardPage.jsx";
+import ProfileSetup from "./Pages/MProfileSetup";
+import AdminPanel from "./Pages/MAdminPanel";
+import AdminCreateExamPage from "./Pages/AdminCreateExamPage.jsx";
+import Planner from "./Pages/Planner";
+
+import { isAdminLoggedIn } from "./lib/session.js";
+
+import StudentHubLayout from "./studentPerformance/StudentHubLayout.jsx";
+import StudentPerformanceDashboard from "./studentPerformance/StudentPerformanceDashboard.jsx";
+import StudentCalendarPage from "./studentPerformance/StudentCalendarPage.jsx";
+import StudentNotificationsPage from "./studentPerformance/StudentNotificationsPage.jsx";
+import StudentGoalsPage from "./studentPerformance/StudentGoalsPage.jsx";
+import StudentStudyPlannerPage from "./studentPerformance/StudentStudyPlannerPage.jsx";
+
+import AiWorkspaceLayout from "./Components/layout/AiWorkspaceLayout.jsx";
+import AiContentGenerator from "./Components/AiContentGenerator.jsx";
+import AiPerformancePage from "./Pages/PerformancePage.jsx";
+import AiMcqBankPage from "./Pages/McqBankPage.jsx";
+import AiFlashcardDecksPage from "./Pages/FlashcardDecksPage.jsx";
+import AiFlashcardStudyPage from "./Pages/FlashcardStudyPage.jsx";
+import AiExamSchedulePage from "./Pages/ExamSchedulePage.jsx";
+import AiExamInterfacePage from "./Pages/ExamInterfacePage.jsx";
+import AiExamResultPage from "./Pages/ExamResultPage.jsx";
+
+function LegacyFlashcardStudyRedirect() {
+  const { deckId } = useParams();
+  return <Navigate to={`/ai-tools/flashcards/study/${deckId}`} replace />;
+}
+
+function LegacyExamRedirect() {
+  const { examId } = useParams();
+  return <Navigate to={`/ai-tools/exams/${examId}`} replace />;
+}
+
+function LegacyExamResultRedirect() {
+  const { examId } = useParams();
+  return <Navigate to={`/ai-tools/exams/${examId}/result`} replace />;
+}
+
+function AccessOnlyCard({ title, description }) {
+  return (
+    <div className="slms-page p-8">
+      <div className="slms-card mx-auto max-w-2xl rounded-[28px] p-8">
+        <h1 className="text-2xl font-semibold text-white">{title}</h1>
+        <p className="mt-3 max-w-xl text-sm leading-7 slms-muted">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function AdminOnlyCreateRoute() {
+  const adminLoggedIn = isAdminLoggedIn();
+
+  if (!adminLoggedIn) {
+    return (
+      <AccessOnlyCard
+        title="Admin Access Only"
+        description="Exams and MCQ Bank items can only be created from an admin login. Log in as an admin to open the create assessment page."
+      />
+    );
+  }
+
+  return <AdminCreateExamPage />;
+}
+
+function AdminOnlyEditRoute() {
+  const adminLoggedIn = isAdminLoggedIn();
+  const { examId } = useParams();
+
+  if (!adminLoggedIn) {
+    return (
+      <AccessOnlyCard
+        title="Admin Access Only"
+        description="Exams can only be updated or deleted from an admin login. Log in as an admin to open the edit page."
+      />
+    );
+  }
+
+  return <AdminCreateExamPage examId={examId} />;
+}
+
+function AdminOnlyCreateMcqBankRoute() {
+  const adminLoggedIn = isAdminLoggedIn();
+
+  if (!adminLoggedIn) {
+    return (
+      <AccessOnlyCard
+        title="Admin Access Only"
+        description="MCQ Bank sets can only be created from an admin login. Log in as an admin to open the MCQ Bank create page."
+      />
+    );
+  }
+
+  return <AdminCreateExamPage initialKind="mcq_bank" lockedKind />;
+}
 
 const App = () => {
   const { loading } = useAuth();
   const { dark } = useTheme();
+
   if (loading) return <FullPageSpinner />;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-body)' }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "var(--bg-body)" }}
+    >
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
           style: {
-            background: dark ? '#1e293b' : '#ffffff',
-            color: dark ? '#f1f5f9' : '#1e293b',
-            border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`,
-            fontSize: '14px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+            background: dark ? "#1e293b" : "#ffffff",
+            color: dark ? "#f1f5f9" : "#1e293b",
+            border: `1px solid ${dark ? "#334155" : "#e2e8f0"}`,
+            fontSize: "14px",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
           },
-          success: { iconTheme: { primary: '#3b82f6', secondary: '#fff' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+          success: { iconTheme: { primary: "#3b82f6", secondary: "#fff" } },
+          error: { iconTheme: { primary: "#ef4444", secondary: "#fff" } },
         }}
       />
+
       <Navbar />
+
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute requireProfile><Dashboard /></ProtectedRoute>} />
+          <Route
+            path="/profile-setup"
+            element={
+              <ProtectedRoute>
+                <ProfileSetup />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute requireProfile>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/performance" element={<StudentHubLayout hubBase="/performance" />}>
+          <Route
+            path="/ai-tools"
+            element={
+              <ProtectedRoute requireProfile>
+                <AiWorkspaceLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AiWorkspaceDashboard />} />
+            <Route path="assistant" element={<AiContentGenerator />} />
+            <Route path="performance" element={<AiPerformancePage />} />
+            <Route path="mcq-bank" element={<AiMcqBankPage />} />
+            <Route path="mcq-bank/create" element={<AdminOnlyCreateMcqBankRoute />} />
+            <Route path="flashcards" element={<AiFlashcardDecksPage />} />
+            <Route path="flashcards/study/:deckId" element={<AiFlashcardStudyPage />} />
+            <Route path="exams" element={<AiExamSchedulePage />} />
+            <Route path="exams/create" element={<AdminOnlyCreateRoute />} />
+            <Route path="exams/:examId" element={<AiExamInterfacePage />} />
+            <Route path="exams/:examId/result" element={<AiExamResultPage />} />
+          </Route>
+
+          <Route path="/mcq-bank" element={<Navigate to="/ai-tools/mcq-bank" replace />} />
+          <Route
+            path="/mcq-bank/create"
+            element={<Navigate to="/ai-tools/mcq-bank/create" replace />}
+          />
+          <Route path="/flashcards" element={<Navigate to="/ai-tools/flashcards" replace />} />
+          <Route path="/flashcards/study/:deckId" element={<LegacyFlashcardStudyRedirect />} />
+          <Route path="/exams" element={<Navigate to="/ai-tools/exams" replace />} />
+          <Route path="/exams/create" element={<Navigate to="/ai-tools/exams/create" replace />} />
+          <Route path="/exam/:examId" element={<LegacyExamRedirect />} />
+          <Route path="/exam/:examId/result" element={<LegacyExamResultRedirect />} />
+
+          <Route
+            path="/performance"
+            element={<StudentHubLayout hubBase="/performance" />}
+          >
             <Route index element={<StudentPerformanceDashboard />} />
             <Route path="calendar" element={<StudentCalendarPage />} />
             <Route path="planner" element={<StudentStudyPlannerPage />} />
@@ -72,17 +214,53 @@ const App = () => {
             <Route path="goals" element={<StudentGoalsPage />} />
           </Route>
 
-          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-          <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
+          />
 
-          <Route path="*" element={
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center">
-                <h1 className="text-7xl font-black text-gradient">404</h1>
-                <p className="mt-3 text-lg" style={{ color: 'var(--text-secondary)' }}>Page not found</p>
+          <Route
+            path="/admin/create-exam"
+            element={<AdminOnlyCreateRoute />}
+          />
+          <Route
+            path="/admin/edit-exam/:examId"
+            element={<AdminOnlyEditRoute />}
+          />
+          <Route
+            path="/admin/create-mcq-bank"
+            element={<AdminOnlyCreateMcqBankRoute />}
+          />
+
+          <Route
+            path="/planner"
+            element={
+              <ProtectedRoute>
+                <Planner />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                  <h1 className="text-7xl font-black text-gradient">404</h1>
+                  <p
+                    className="mt-3 text-lg"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    Page not found
+                  </p>
+                </div>
               </div>
-            </div>
-          } />
+            }
+          />
         </Routes>
       </main>
     </div>

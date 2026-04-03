@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 // Route Imports
 import authRoutes from './routes/authRoutes.js';
@@ -17,6 +18,13 @@ import noteRoutes from './routes/noteRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import qaRoutes from './routes/qaRoutes.js';
 import moderationRoutes from './routes/moderationRoutes.js';
+import assessmentPerformanceRoutes from './routes/assessmentPerformanceRoutes.js';
+
+const require = createRequire(import.meta.url);
+const contentRoutes = require('./routes/contentRoutes.jsx');
+const assessmentRoutes = require('./routes/assessmentRoutes.jsx');
+const flashcardRoutes = require('./routes/flashcardRoutes.jsx');
+const mcqBankRoutes = require('./routes/mcqBankRoutes.jsx');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,10 +34,13 @@ const PORT = process.env.PORT || 5000;
 
 // Database Connection Function
 async function connectDatabase() {
-  const uri = process.env.MONGO_URI ? process.env.MONGO_URI.trim() : null;
+  const uri =
+    (process.env.MONGO_URI && process.env.MONGO_URI.trim()) ||
+    (process.env.MONGODB_URI && process.env.MONGODB_URI.trim()) ||
+    null;
   
   if (!uri) {
-    console.error("❌ Error: MONGO_URI is not defined in .env file!");
+    console.error("❌ Error: define MONGO_URI or MONGODB_URI in .env file!");
     process.exit(1);
   }
 
@@ -82,6 +93,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/assessment', assessmentPerformanceRoutes);
+app.use('/api/assessment', assessmentRoutes);
+app.use('/api/flashcards', flashcardRoutes);
+app.use('/api/mcq-bank', mcqBankRoutes);
 
 // Member 2 - Notes & Engagement Routes
 app.use('/api/notes', noteRoutes);

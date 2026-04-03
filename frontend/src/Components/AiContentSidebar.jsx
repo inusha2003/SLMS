@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
   ArrowLeft,
@@ -18,19 +18,30 @@ import {
 } from "../lib/session.js";
 
 const NAV_ITEMS = [
-  { key: "dashboard", label: "Dashboard", to: "/", Icon: Square },
-  { key: "performance", label: "Performance", to: "/performance", Icon: LibraryBig },
-  { key: "ai-tools", label: "AI Tools", to: "/ai-tools", Icon: Activity },
-  { key: "mcq-bank", label: "MCQ Bank", to: "/mcq-bank", Icon: ClipboardList },
-  { key: "flashcards", label: "Flashcards", to: "/flashcards", Icon: Layers },
-  { key: "exams", label: "Exams", to: "/exams", Icon: FileText },
+  { key: "dashboard", label: "Dashboard", to: "/ai-tools", Icon: Square },
+  { key: "assistant", label: "AI Assistant", to: "/ai-tools/assistant", Icon: Activity },
+  { key: "performance", label: "Performance", to: "/ai-tools/performance", Icon: LibraryBig },
+  { key: "mcq-bank", label: "MCQ Bank", to: "/ai-tools/mcq-bank", Icon: ClipboardList },
+  { key: "flashcards", label: "Flashcards", to: "/ai-tools/flashcards", Icon: Layers },
+  { key: "exams", label: "Exams", to: "/ai-tools/exams", Icon: FileText },
 ];
 
-export default function Sidebar({ active = "ai-tools" }) {
+function getActiveKey(pathname) {
+  if (pathname.startsWith("/ai-tools/assistant")) return "assistant";
+  if (pathname.startsWith("/ai-tools/performance")) return "performance";
+  if (pathname.startsWith("/ai-tools/mcq-bank")) return "mcq-bank";
+  if (pathname.startsWith("/ai-tools/flashcards")) return "flashcards";
+  if (pathname.startsWith("/ai-tools/exams") || pathname.startsWith("/ai-tools/exam")) return "exams";
+  return "dashboard";
+}
+
+export default function AiContentSidebar({ active }) {
+  const location = useLocation();
   const navigate = useNavigate();
   const loggedIn = isLoggedIn();
   const userName = getStoredUserName();
   const userRole = getStoredUserRole();
+  const activeKey = active || getActiveKey(location.pathname);
 
   return (
     <aside className="sticky top-0 flex h-screen w-[252px] shrink-0 flex-col overflow-hidden border-r border-white/8 bg-[linear-gradient(180deg,rgba(7,17,31,0.96),rgba(5,11,22,0.98))] backdrop-blur-xl">
@@ -53,6 +64,7 @@ export default function Sidebar({ active = "ai-tools" }) {
           <button
             type="button"
             aria-label="Back"
+            onClick={() => navigate("/dashboard")}
             className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-white/8 bg-white/[0.04] text-slate-400 transition hover:border-cyan-400/30 hover:text-cyan-200"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -63,7 +75,7 @@ export default function Sidebar({ active = "ai-tools" }) {
       <nav className="flex flex-col gap-2 px-3 py-5">
         {NAV_ITEMS.map((item) => {
           const { key, label, to, Icon } = item;
-          const isActive = key === active;
+          const isActive = key === activeKey;
           return (
             <Link
               key={key}
