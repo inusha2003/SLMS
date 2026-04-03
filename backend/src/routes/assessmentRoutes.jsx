@@ -1,24 +1,38 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
 const Exam = require("../models/ExamModel.jsx");
-const User = require("../models/UserModel.jsx");
 const Performance = require("../models/PerformanceModel.jsx");
-const { readBearerToken, verifyAuthToken } = require("../utils/authToken.js");
+
+async function loadMainUserModel() {
+  return (await import("../models/User.js")).default;
+}
 
 async function loadUserFromHeader(req) {
-  const bearerToken = readBearerToken(req);
-  if (bearerToken) {
-    const payload = verifyAuthToken(bearerToken);
-    if (payload?.sub && /^[a-fA-F0-9]{24}$/.test(payload.sub)) {
-      return User.findById(payload.sub).lean();
+  const header = req.header("authorization") || req.header("Authorization") || "";
+  const match = String(header).match(/^Bearer\s+(.+)$/i);
+  const token = match ? match[1].trim() : "";
+  if (token) {
+    const secret = String(process.env.JWT_SECRET || "").trim();
+    if (!secret) return null;
+    try {
+      const payload = jwt.verify(token, secret);
+      const userId = payload?.userId || payload?.sub;
+      if (userId && /^[a-fA-F0-9]{24}$/.test(String(userId))) {
+        const User = await loadMainUserModel();
+        return User.findById(userId).lean();
+      }
+      return null;
+    } catch {
+      return null;
     }
-    return null;
   }
 
   const userId = req.header("x-user-id");
   if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) return null;
+  const User = await loadMainUserModel();
   return User.findById(userId).lean();
 }
 
@@ -332,7 +346,13 @@ router.patch("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
       return res.status(400).json({ message: "Invalid examId." });
     }
 
+    const existingExam = await Exam.findById(examId).lean();
+    if (!existingExam) {
+      return res.status(404).json({ message: "Assessment not found." });
+    }
+
     const {
+      kind,
       title,
       subject,
       semester,
@@ -345,7 +365,8 @@ router.patch("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
       startTime,
     } = req.body || {};
     const updates = {};
-    const nextKind = "exam";
+    const unsets = {};
+    const nextKind = kind === "mcq_bank" ? "mcq_bank" : existingExam.kind || "exam";
 
     if (title != null) {
       const nextTitle = String(title).trim();
@@ -407,24 +428,49 @@ router.patch("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
     }
     if (exactSchedule && !Number.isNaN(exactSchedule.getTime())) {
       updates.scheduledAt = exactSchedule;
+    } else if (nextKind === "mcq_bank") {
+      unsets.scheduledAt = 1;
     }
 
-    if (startTime != null && String(startTime).trim()) {
+    if (nextKind === "exam" && startTime != null && String(startTime).trim()) {
       updates.startTime = String(startTime).trim();
+    } else if (nextKind === "mcq_bank") {
+      updates.startTime = "09:00";
     }
 
     if (Object.keys(updates).length === 0) {
+      if (Object.keys(unsets).length === 0) {
+        return res.status(400).json({ message: "No valid fields to update." });
+      }
+    }
+
+    const updateDoc = {};
+    if (Object.keys(updates).length > 0) {
+      updateDoc.$set = updates;
+    }
+    if (Object.keys(unsets).length > 0) {
+      updateDoc.$unset = unsets;
+    }
+
+    if (Object.keys(updateDoc).length === 0) {
       return res.status(400).json({ message: "No valid fields to update." });
     }
 
     const exam = await Exam.findOneAndUpdate(
-      { _id: examId, kind: "exam" },
-      { $set: updates },
+      { _id: examId, kind: nextKind },
+      updateDoc,
       { new: true }
     ).lean();
-    if (!exam) return res.status(404).json({ message: "Exam not found." });
+    if (!exam) {
+      return res.status(404).json({
+        message: nextKind === "mcq_bank" ? "MCQ Bank set not found." : "Exam not found.",
+      });
+    }
 
-    return res.status(200).json({ message: "Exam updated", exam: summarizeExam(exam) });
+    return res.status(200).json({
+      message: nextKind === "mcq_bank" ? "MCQ Bank set updated" : "Exam updated",
+      exam: summarizeExam(exam),
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error updating exam." });
@@ -438,19 +484,36 @@ router.delete("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
       return res.status(400).json({ message: "Invalid examId." });
     }
 
-    const attemptCount = await Performance.countDocuments({ exam: examId });
-    if (attemptCount > 0) {
-      return res.status(409).json({
-        message: "This exam cannot be deleted because students have already attempted it.",
+    const existingExam = await Exam.findById(examId).lean();
+    if (!existingExam) {
+      return res.status(404).json({ message: "Assessment not found." });
+    }
+
+    if (existingExam.kind === "exam") {
+      const attemptCount = await Performance.countDocuments({ exam: examId });
+      if (attemptCount > 0) {
+        return res.status(409).json({
+          message: "This exam cannot be deleted because students have already attempted it.",
+        });
+      }
+    }
+
+    const deletedExam = await Exam.findOneAndDelete({
+      _id: examId,
+      kind: existingExam.kind,
+    }).lean();
+    if (!deletedExam) {
+      return res.status(404).json({
+        message: existingExam.kind === "mcq_bank" ? "MCQ Bank set not found." : "Exam not found.",
       });
     }
 
-    const deletedExam = await Exam.findOneAndDelete({ _id: examId, kind: "exam" }).lean();
-    if (!deletedExam) {
-      return res.status(404).json({ message: "Exam not found." });
-    }
-
-    return res.status(200).json({ message: "Exam deleted successfully." });
+    return res.status(200).json({
+      message:
+        existingExam.kind === "mcq_bank"
+          ? "MCQ Bank set deleted successfully."
+          : "Exam deleted successfully.",
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error deleting exam." });
@@ -509,11 +572,17 @@ router.get("/exams/:examId", attachUser, async (req, res) => {
       return res.status(400).json({ message: "Invalid examId." });
     }
 
-    const exam = await Exam.findOne({ _id: examId, kind: "exam" }).lean();
-    if (!exam) return res.status(404).json({ message: "Exam not found." });
+    const exam = await Exam.findById(examId).lean();
+    if (!exam) return res.status(404).json({ message: "Assessment not found." });
 
     if (req.user?.role === "Admin") {
       return res.status(200).json({ exam: { ...exam, status: getComputedStatus(exam) } });
+    }
+
+    if (exam.kind !== "exam") {
+      return res.status(403).json({
+        message: "Students should access MCQ Bank sets from the MCQ Bank page.",
+      });
     }
 
     if (req.user?.role === "Student" && !canStudentAccessExam(req.user, exam)) {

@@ -6,7 +6,10 @@ import {
   ChevronRight,
   Clock3,
   Loader2,
+  Pencil,
   Search,
+  Trash2,
+  X,
 } from "lucide-react";
 import { apiUrl } from "../lib/api.js";
 import {
@@ -16,7 +19,7 @@ import {
   isAdminLoggedIn,
 } from "../lib/session.js";
 import {
-  canAccessSemesterOption,   // drop down bar validation
+  canAccessSemesterOption,
   formatSemesterLabel,
   getSemesterOptions,
 } from "../lib/semester.js";
@@ -25,7 +28,6 @@ const SEMESTER_OPTIONS = getSemesterOptions();
 
 function validateSearchQuery(value) {
   const trimmed = String(value || "").trim().replace(/\s+/g, " ");
-// Add search bar validation
   if (!trimmed) {
     return { ok: true, normalized: "" };
   }
@@ -87,6 +89,9 @@ export default function McqBankPage() {
   const [semester, setSemester] = useState("");
   const [subject, setSubject] = useState("");
   const [subjects, setSubjects] = useState([]);
+  const [feedback, setFeedback] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const adminLoggedIn = useMemo(() => isAdminLoggedIn(), []);
   const storedUserRole = useMemo(() => getStoredUserRole(), []);
   const storedUserSemester = useMemo(() => getStoredUserSemester(), []);
@@ -157,7 +162,7 @@ export default function McqBankPage() {
     } finally {
       setLoading(false);
     }
-  }, [queryString, search, storedUserRole, storedUserSemester]);
+  }, [queryString, search, semester, storedUserRole, storedUserSemester]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -169,6 +174,39 @@ export default function McqBankPage() {
   useEffect(() => {
     setSubject("");
   }, [semester]);
+
+  useEffect(() => {
+    if (!feedback) return undefined;
+    const timerId = window.setTimeout(() => setFeedback(null), 3500);
+    return () => window.clearTimeout(timerId);
+  }, [feedback]);
+
+  async function handleDeleteSet() {
+    if (!deleteTarget || deleteLoading) return;
+
+    setDeleteLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch(apiUrl(`/api/assessment/exams/${deleteTarget.id}`), {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Failed to delete MCQ Bank set.");
+
+      setDeleteTarget(null);
+      setFeedback({ type: "success", text: "MCQ Bank set deleted successfully." });
+      await load();
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        text: err.message || "Could not delete MCQ Bank set.",
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
 
   return (
     <div className="slms-page min-h-full px-8 py-8 lg:px-10">
@@ -200,6 +238,19 @@ export default function McqBankPage() {
             )}
           </div>
         </header>
+
+        {feedback && (
+          <div
+            className={[
+              "mb-6 rounded-[18px] border px-5 py-4 text-sm",
+              feedback.type === "error"
+                ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
+                : "border-emerald-500/30 bg-emerald-500/10 text-emerald-200",
+            ].join(" ")}
+          >
+            {feedback.text}
+          </div>
+        )}
 
         <section className="slms-card slms-fade-up slms-stagger-1 mb-8 rounded-[26px] px-4 py-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
@@ -362,10 +413,74 @@ export default function McqBankPage() {
               >
                 Open MCQ Set →
               </Link>
+
+              {adminLoggedIn && (
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <Link
+                    to={`/mcq-bank/${set.id}/edit`}
+                    className="inline-flex items-center justify-center gap-2 rounded-[16px] border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/15"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Update
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(set)}
+                    className="inline-flex items-center justify-center gap-2 rounded-[16px] border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/15"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </button>
+                </div>
+              )}
             </article>
           ))}
         </div>
       </div>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020617]/75 px-4">
+          <div className="w-full max-w-md rounded-[26px] border border-white/10 bg-[#10192a] p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Delete MCQ Bank Set?</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  Are you sure you want to delete "{deleteTarget.title}"? This action cannot be
+                  undone.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                className="rounded-full border border-white/10 p-2 text-slate-300 transition hover:bg-white/5 hover:text-white"
+                disabled={deleteLoading}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleteLoading}
+                className="rounded-[14px] border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteSet}
+                disabled={deleteLoading}
+                className="inline-flex items-center gap-2 rounded-[14px] bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-500 disabled:opacity-60"
+              >
+                {deleteLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {deleteLoading ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

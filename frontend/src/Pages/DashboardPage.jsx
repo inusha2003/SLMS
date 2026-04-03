@@ -283,7 +283,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <Link
-                    to={adminLoggedIn ? "/exams" : "/performance"}
+                      to={adminLoggedIn ? "/ai-tools/exams" : "/ai-tools/performance"}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200 hover:text-cyan-100"
                   >
                     Open
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                 {adminLoggedIn ? (
                   <div className="mt-5 grid gap-4 md:grid-cols-2">
                     <Link
-                      to="/exams/create"
+                      to="/ai-tools/exams/create"
                       className="rounded-[24px] border border-cyan-400/18 bg-[linear-gradient(135deg,rgba(34,211,238,0.14),rgba(12,24,40,0.9))] p-5 transition hover:-translate-y-1"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
@@ -306,7 +306,7 @@ export default function DashboardPage() {
                       </p>
                     </Link>
                     <Link
-                      to="/mcq-bank/create"
+                      to="/ai-tools/mcq-bank/create"
                       className="rounded-[24px] border border-orange-400/18 bg-[linear-gradient(135deg,rgba(251,146,60,0.16),rgba(12,24,40,0.9))] p-5 transition hover:-translate-y-1"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-200">
@@ -332,7 +332,7 @@ export default function DashboardPage() {
                         </p>
                       </div>
                       <Link
-                        to="/exams"
+                          to="/ai-tools/exams"
                         className="inline-flex items-center gap-2 rounded-[16px] bg-cyan-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
                       >
                         View Exam Schedule
@@ -378,21 +378,26 @@ export default function DashboardPage() {
                 <div className="mt-5 space-y-3">
                   {[
                     {
-                      to: "/performance",
+                      to: "/ai-tools/performance",
                       title: "Performance",
                       text: adminLoggedIn
                         ? "Review student-facing analytics view."
                         : "See score trends and subject insights.",
                     },
                     {
-                      to: "/exams",
+                      to: "/ai-tools/assistant",
+                      title: "AI Assistant",
+                      text: "Generate notes, MCQs, or flashcards.",
+                    },
+                    {
+                      to: "/ai-tools/exams",
                       title: "Exam Schedule",
                       text: adminLoggedIn
                         ? "Manage upcoming and completed assessments."
                         : "Open exams, schedules, and results.",
                     },
                     {
-                      to: adminLoggedIn ? "/mcq-bank/create" : "/flashcards",
+                      to: adminLoggedIn ? "/ai-tools/mcq-bank/create" : "/ai-tools/flashcards",
                       title: adminLoggedIn ? "MCQ Bank Create" : "Flashcards",
                       text: adminLoggedIn
                         ? "Publish a new review set."
@@ -425,7 +430,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <Link
-                    to="/flashcards"
+                    to="/ai-tools/flashcards"
                     className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200 hover:text-cyan-100"
                   >
                     Open All
@@ -445,7 +450,7 @@ export default function DashboardPage() {
                     {flashcards.slice(0, 3).map((deck) => (
                       <Link
                         key={deck.id}
-                        to={`/flashcards/study/${deck.id}`}
+                        to={`/ai-tools/flashcards/study/${deck.id}`}
                         className="rounded-[24px] border border-white/8 bg-[#0c1828]/90 p-5 transition hover:-translate-y-1"
                       >
                         <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">

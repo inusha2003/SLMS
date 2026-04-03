@@ -1,7 +1,7 @@
 const express = require("express");
 
 const User = require("../models/UserModel.jsx");
-const { issueAuthToken } = require("../utils/authToken.js");
+const { issueAuthToken } = require("../utils/authToken.cjs");
 
 const router = express.Router();
 

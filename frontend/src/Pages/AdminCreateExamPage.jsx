@@ -298,12 +298,6 @@ export default function AdminCreateExamPage({
             {pageTitle}
           </h1>
           <p className="mt-2 text-sm text-[#8d89ab]">{introText}</p>
-          {!lockedKind && (
-            <p className="mt-2 text-xs text-[#777394]">
-              `Timed Exam` hadoth item eka `Exams` page eke penne. `MCQ Bank Set` hadoth item eka
-              `MCQ Bank` page eke penne.
-            </p>
-          )}
         </header>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">

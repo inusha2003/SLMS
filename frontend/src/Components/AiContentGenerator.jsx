@@ -447,32 +447,36 @@ export default function AiContentGenerator() {
                   />
                 </label>
 
-                <label className="relative block">
-                  <span className="mb-2 block text-sm font-medium slms-muted"> // use can select semester selection with user access validation
-                    Semester {!isFileMode && <span className="text-rose-400">*</span>}
-                  </span>
-                  <select
-                    value={semester}
-                    onChange={(e) => setSemester(e.target.value)}
-                    className={[
-                      "slms-input w-full appearance-none rounded-[16px] px-4 py-3.5 pr-11 text-[1rem] focus:outline-none",
-                      semester ? "text-white" : "text-slate-500",
-                    ].join(" ")}
-                  >
-                    <option value="" disabled>
-                      Select Semester
-                    </option>
-                    {SEMESTER_OPTIONS.map((s) => (
-                      <option
-                        key={s.value}
-                        value={s.value}
-                        disabled={!canAccessSemesterOption(storedUserSemester, s.value)}
-                      >
-                        {s.label}
+                <label className="block">
+                  <div className="mb-2">
+                    <span className="block text-sm font-medium slms-muted">
+                      Semester {!isFileMode && <span className="text-rose-400">*</span>}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={semester}
+                      onChange={(e) => setSemester(e.target.value)}
+                      className={[
+                        "slms-input w-full appearance-none rounded-[16px] px-4 py-3.5 pr-11 text-[1rem] focus:outline-none",
+                        semester ? "text-white" : "text-slate-500",
+                      ].join(" ")}
+                    >
+                      <option value="" disabled>
+                        Select Semester
                       </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-4 top-[52px] h-5 w-5 text-slate-500" />
+                      {SEMESTER_OPTIONS.map((s) => (
+                        <option
+                          key={s.value}
+                          value={s.value}
+                          disabled={!canAccessSemesterOption(storedUserSemester, s.value)}
+                        >
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+                  </div>
                 </label>
               </div>
               <p className="text-xs leading-6 slms-muted">
