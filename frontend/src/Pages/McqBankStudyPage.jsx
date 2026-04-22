@@ -3,11 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { apiUrl } from "../lib/api.js";
 import { getAuthHeaders, getStoredUserRole, getStoredUserSemester } from "../lib/session.js";
-import { formatSemesterLabel } from "../lib/semester.js";
+import { formatSemesterLabel, parseSemesterValue } from "../lib/semester.js";
 
 function canStudentAccessMcqSet(studentSemesterValue, setSemesterValue) {
-  const studentSemester = Number(studentSemesterValue);
-  const setSemester = Number(setSemesterValue);
+  const studentSemester = parseSemesterValue(studentSemesterValue);
+  const setSemester = parseSemesterValue(setSemesterValue);
 
   if (!Number.isFinite(studentSemester) || !Number.isFinite(setSemester)) {
     return false;

@@ -1,38 +1,24 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
 const Exam = require("../models/ExamModel.jsx");
 const Performance = require("../models/PerformanceModel.jsx");
-
-async function loadMainUserModel() {
-  return (await import("../models/User.js")).default;
-}
+const User = require("../models/UserModel.jsx");
+const { readBearerToken, verifyAuthToken } = require("../utils/authToken.cjs");
 
 async function loadUserFromHeader(req) {
-  const header = req.header("authorization") || req.header("Authorization") || "";
-  const match = String(header).match(/^Bearer\s+(.+)$/i);
-  const token = match ? match[1].trim() : "";
-  if (token) {
-    const secret = String(process.env.JWT_SECRET || "").trim();
-    if (!secret) return null;
-    try {
-      const payload = jwt.verify(token, secret);
-      const userId = payload?.userId || payload?.sub;
-      if (userId && /^[a-fA-F0-9]{24}$/.test(String(userId))) {
-        const User = await loadMainUserModel();
-        return User.findById(userId).lean();
-      }
-      return null;
-    } catch {
-      return null;
+  const bearerToken = readBearerToken(req);
+  if (bearerToken) {
+    const payload = verifyAuthToken(bearerToken);
+    if (payload?.sub && /^[a-fA-F0-9]{24}$/.test(payload.sub)) {
+      return User.findById(payload.sub).lean();
     }
+    return null;
   }
 
   const userId = req.header("x-user-id");
   if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) return null;
-  const User = await loadMainUserModel();
   return User.findById(userId).lean();
 }
 
@@ -181,8 +167,40 @@ function isFourthYearSemester(semesterValue) {
   return Number.isFinite(semesterNumber) && semesterNumber >= 7;
 }
 
+function normalizeStudentSemester(user) {
+  const directSemester = Number(user?.semester);
+  if (Number.isFinite(directSemester) && directSemester >= 1) {
+    return Math.floor(directSemester);
+  }
+
+  const academicYearLabel = String(user?.academicYear || "").trim().toLowerCase();
+  const semesterLabel = String(user?.semester || "").trim().toLowerCase();
+
+  const yearMatch = academicYearLabel.match(/^(\d+)/);
+  const semesterMatch = semesterLabel.match(/^(\d+)/);
+
+  if (!yearMatch || !semesterMatch) {
+    return null;
+  }
+
+  const year = Number(yearMatch[1]);
+  const semesterOfYear = Number(semesterMatch[1]);
+
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(semesterOfYear) ||
+    year < 1 ||
+    semesterOfYear < 1 ||
+    semesterOfYear > 2
+  ) {
+    return null;
+  }
+
+  return (year - 1) * 2 + semesterOfYear;
+}
+
 function canStudentAccessExam(student, exam) {
-  const studentSemester = Number(student?.semester);
+  const studentSemester = normalizeStudentSemester(student);
   const examSemester = Number(exam?.semester);
 
   if (!Number.isFinite(studentSemester) || !Number.isFinite(examSemester)) {
@@ -279,8 +297,13 @@ router.get("/exams", attachUser, async (req, res) => {
     const { status } = req.query;
 
     const filter = { kind: "exam" };
-    if (req.user?.role === "Student" && req.user?.semester && !isFourthYearSemester(req.user.semester)) {
-      filter.semester = { $lte: Number(req.user.semester) };
+    const normalizedStudentSemester = normalizeStudentSemester(req.user);
+    if (
+      req.user?.role === "Student" &&
+      normalizedStudentSemester &&
+      !isFourthYearSemester(normalizedStudentSemester)
+    ) {
+      filter.semester = { $lte: normalizedStudentSemester };
     }
 
     const exams = await Exam.find(filter)

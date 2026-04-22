@@ -1,0 +1,294 @@
+@import "tailwindcss";
+
+.slms-page {
+  position: relative;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top right, rgba(79, 209, 197, 0.09), transparent 22%),
+    radial-gradient(circle at left bottom, rgba(14, 165, 233, 0.08), transparent 24%);
+}
+
+.theme-light .slms-page {
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent 22%),
+    radial-gradient(circle at left bottom, rgba(99, 102, 241, 0.1), transparent 24%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.theme-light .slms-page::after {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.04), transparent 18%);
+}
+
+.slms-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%);
+}
+
+.slms-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+.slms-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.slms-hero::before,
+.slms-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(14px);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.slms-hero::before {
+  top: -80px;
+  right: 6%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(79, 209, 197, 0.28), transparent 68%);
+  animation: slmsFloat 14s ease-in-out infinite;
+}
+
+.slms-hero::after {
+  bottom: -90px;
+  left: 10%;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.2), transparent 70%);
+  animation: slmsFloat 18s ease-in-out infinite reverse;
+}
+
+.slms-card {
+  background: linear-gradient(180deg, rgba(15, 27, 45, 0.92), rgba(8, 17, 30, 0.94));
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(14px);
+}
+
+.theme-light .slms-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.98));
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.slms-card-soft {
+  background: linear-gradient(180deg, rgba(14, 24, 40, 0.82), rgba(8, 16, 28, 0.86));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.theme-light .slms-card-soft {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.98));
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.slms-input {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(10, 22, 38, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.theme-light .slms-input {
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+}
+
+.slms-input:focus {
+  border-color: rgba(79, 209, 197, 0.65);
+  box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.12);
+}
+
+.theme-light .slms-input:focus {
+  border-color: rgba(14, 165, 233, 0.65);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.14);
+}
+
+.slms-primary-btn {
+  background-image: linear-gradient(135deg, #14b8a6, #0ea5e9 55%, #fb923c);
+  box-shadow: 0 18px 40px rgba(14, 165, 233, 0.22);
+}
+
+.slms-primary-btn:hover {
+  filter: brightness(1.06);
+}
+
+.slms-glow-ring {
+  position: relative;
+}
+
+.slms-glow-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 209, 197, 0.4),
+    rgba(14, 165, 233, 0.18),
+    rgba(251, 146, 60, 0.3)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.slms-muted {
+  color: #94a3b8;
+}
+
+.theme-light .slms-muted {
+  color: #475569;
+}
+
+.slms-section-title {
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.theme-light .slms-section-title {
+  color: #0f172a;
+}
+
+.slms-fade-up {
+  animation: slmsFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.slms-fade-in {
+  animation: slmsFadeIn 0.8s ease both;
+}
+
+.slms-stagger-1 {
+  animation-delay: 0.08s;
+}
+
+.slms-stagger-2 {
+  animation-delay: 0.16s;
+}
+
+.slms-stagger-3 {
+  animation-delay: 0.24s;
+}
+
+.slms-hover-lift {
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.slms-hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.3);
+}
+
+.slms-chip {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(12px);
+}
+
+.slms-animated-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at center, #000 38%, transparent 82%);
+}
+
+.slms-flip-scene {
+  perspective: 1600px;
+}
+
+.slms-flip-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slms-flip-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.slms-flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.slms-flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+@keyframes slmsFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slmsFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slmsFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, 18px, 0) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slms-fade-up,
+  .slms-fade-in,
+  .slms-hero::before,
+  .slms-hero::after {
+    animation: none;
+  }
+
+  .slms-hover-lift,
+  .slms-hover-lift:hover {
+    transition: none;
+    transform: none;
+  }
+
+  .slms-flip-card,
+  .slms-flip-card.is-flipped {
+    transition: none;
+    transform: none;
+  }
+
+  .slms-flip-back {
+    position: static;
+    transform: none;
+  }
+}

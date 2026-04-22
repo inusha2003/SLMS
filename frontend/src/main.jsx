@@ -5,7 +5,6 @@ import { AuthProvider } from './context/MAuthContext.jsx';
 import { ThemeProvider } from './context/MThemeContext.jsx';
 import { TaskProvider } from './context/MTaskContext.jsx';
 import App from './App.jsx';
-import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
