@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
-import "./App.css";
 import { Toaster } from "react-hot-toast";
 
 import { useAuth } from "./context/MAuthContext";
@@ -52,6 +51,11 @@ function LegacyExamRedirect() {
 function LegacyExamResultRedirect() {
   const { examId } = useParams();
   return <Navigate to={`/ai-tools/exams/${examId}/result`} replace />;
+}
+
+function LegacyExamEditRedirect() {
+  const { examId } = useParams();
+  return <Navigate to={`/ai-tools/exams/${examId}/edit`} replace />;
 }
 
 function AccessOnlyCard({ title, description }) {
@@ -120,7 +124,28 @@ const App = () => {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ backgroundColor: "var(--bg-body)" }}
+      style={{
+        backgroundColor: dark ? "#050b16" : "#f8fafc",
+        color: dark ? "#f1f5f9" : "#0f172a",
+        "--bg-body": dark ? "#050b16" : "#f8fafc",
+        "--bg-nav": dark ? "rgba(5, 11, 22, 0.92)" : "rgba(255, 255, 255, 0.92)",
+        "--bg-card": dark ? "#0f172a" : "#ffffff",
+        "--bg-surface": dark ? "#111827" : "#f1f5f9",
+        "--bg-input": dark ? "#0b1220" : "#ffffff",
+        "--bg-input-focus": dark ? "#111827" : "#f8fafc",
+        "--text-primary": dark ? "#f8fafc" : "#0f172a",
+        "--text-secondary": dark ? "#94a3b8" : "#475569",
+        "--text-muted": dark ? "#64748b" : "#94a3b8",
+        "--border-color": dark ? "rgba(148, 163, 184, 0.25)" : "rgba(15, 23, 42, 0.12)",
+        "--color-lms-primary": "#3b82f6",
+        "--color-lms-secondary": "#6366f1",
+        "--color-lms-accent": "#6366f1",
+        "--color-lms-muted": "#64748b",
+        "--color-lms-warm": "#8b5cf6",
+        "--color-lms-teal": "#14b8a6",
+        "--color-lms-rose": "#f43f5e",
+        "--color-lms-amber": "#f59e0b",
+      }}
     >
       <Toaster
         position="top-right"
@@ -179,6 +204,7 @@ const App = () => {
             <Route path="flashcards/study/:deckId" element={<AiFlashcardStudyPage />} />
             <Route path="exams" element={<AiExamSchedulePage />} />
             <Route path="exams/create" element={<AdminOnlyCreateRoute />} />
+            <Route path="exams/:examId/edit" element={<AdminOnlyEditRoute />} />
             <Route path="exams/:examId" element={<AiExamInterfacePage />} />
             <Route path="exams/:examId/result" element={<AiExamResultPage />} />
           </Route>
@@ -192,6 +218,7 @@ const App = () => {
           <Route path="/flashcards/study/:deckId" element={<LegacyFlashcardStudyRedirect />} />
           <Route path="/exams" element={<Navigate to="/ai-tools/exams" replace />} />
           <Route path="/exams/create" element={<Navigate to="/ai-tools/exams/create" replace />} />
+          <Route path="/exams/:examId/edit" element={<LegacyExamEditRedirect />} />
           <Route path="/exam/:examId" element={<LegacyExamRedirect />} />
           <Route path="/exam/:examId/result" element={<LegacyExamResultRedirect />} />
 

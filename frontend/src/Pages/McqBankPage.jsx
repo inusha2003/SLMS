@@ -22,6 +22,7 @@ import {
   canAccessSemesterOption,
   formatSemesterLabel,
   getSemesterOptions,
+  parseSemesterValue,
 } from "../lib/semester.js";
 
 const SEMESTER_OPTIONS = getSemesterOptions();
@@ -66,8 +67,8 @@ function subjectPillClass(subject) {
 }
 
 function canStudentAccessMcqSet(studentSemesterValue, setSemesterValue) {
-  const studentSemester = Number(studentSemesterValue);
-  const setSemester = Number(setSemesterValue);
+  const studentSemester = parseSemesterValue(studentSemesterValue);
+  const setSemester = parseSemesterValue(setSemesterValue);
 
   if (!Number.isFinite(studentSemester) || !Number.isFinite(setSemester)) {
     return false;

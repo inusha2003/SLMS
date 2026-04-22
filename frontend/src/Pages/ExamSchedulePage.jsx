@@ -14,6 +14,17 @@ import {
 import { apiUrl } from "../lib/api.js";
 import { getAuthHeaders, getAuthToken, isAdminLoggedIn } from "../lib/session.js";
 import { formatSemesterLabel } from "../lib/semester.js";
+import "./ExamSchedulePage.css";
+
+function formatFullDate(isoValue) {
+  const date = isoValue ? new Date(isoValue) : null;
+  if (!date || Number.isNaN(date.getTime())) return "Date to be announced";
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 function formatDateBlock(isoValue) {
   const date = isoValue ? new Date(isoValue) : new Date();
@@ -48,6 +59,10 @@ function hasExamStarted(exam) {
 function getExamDisplayStatus(exam, adminLoggedIn) {
   if (adminLoggedIn) return exam.status;
   return exam?.viewerHasSubmitted ? "Completed" : "Upcoming";
+}
+
+function getUpcomingExamCount(exams, adminLoggedIn) {
+  return exams.filter((exam) => getExamDisplayStatus(exam, adminLoggedIn) === "Upcoming").length;
 }
 
 export default function ExamSchedulePage() {
@@ -102,9 +117,7 @@ export default function ExamSchedulePage() {
 
   const counts = useMemo(() => {
     const all = exams.length;
-    const upcoming = exams.filter(
-      (exam) => getExamDisplayStatus(exam, adminLoggedIn) === "Upcoming",
-    ).length;
+    const upcoming = getUpcomingExamCount(exams, adminLoggedIn);
     const completed = exams.filter(
       (exam) => getExamDisplayStatus(exam, adminLoggedIn) === "Completed",
     ).length;
@@ -146,32 +159,34 @@ export default function ExamSchedulePage() {
   }
 
   return (
-    <div className="slms-page min-h-full px-8 py-8 lg:px-10">
-      <div className="slms-page-content mx-auto max-w-6xl">
-        <header className="slms-card slms-hero slms-glow-ring slms-fade-up mb-10 rounded-[30px] px-6 py-7 lg:px-8">
-          <div className="slms-animated-grid" />
+    <div className="exam-schedule-page min-h-full px-8 py-8 lg:px-10">
+      <div className="exam-schedule-shell mx-auto max-w-6xl">
+        <header className="exam-schedule-hero mb-10 rounded-[30px] px-6 py-7 lg:px-8">
+          <div className="exam-schedule-grid" />
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
-              <span className="slms-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-orange-100">
+              <span className="exam-schedule-chip exam-schedule-chip--warm inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-orange-100">
                 Assessment Flow
               </span>
               <h1 className="mt-4 text-[3rem] font-black tracking-[-0.05em] text-white">
                 Exam Schedule
               </h1>
-              <p className="mt-3 text-sm leading-7 slms-muted">
-                Manage and monitor IT faculty exams across all semesters.
+              <p className="exam-schedule-muted mt-3 text-sm leading-7">
+                {adminLoggedIn
+                  ? "Manage and monitor IT faculty exams across all semesters."
+                  : "See the exams your admin team has published for your semester and jump in when they open."}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <span className="slms-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-emerald-200">
+              <span className="exam-schedule-chip exam-schedule-chip--success inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-emerald-200">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
                 {counts.upcoming} Upcoming
               </span>
               {adminLoggedIn && (
                 <Link
                   to="/exams/create"
-                  className="slms-primary-btn rounded-[16px] px-4 py-3 text-sm font-semibold text-white"
+                  className="exam-schedule-primary-btn rounded-[16px] px-4 py-3 text-sm font-semibold text-white"
                 >
                   Create Exam
                 </Link>
@@ -180,13 +195,59 @@ export default function ExamSchedulePage() {
           </div>
         </header>
 
+        <section className="mb-8 grid gap-4 md:grid-cols-3">
+          {[
+            {
+              label: adminLoggedIn ? "Published Exams" : "Available Exams",
+              value: counts.all,
+              tone: "from-cyan-500/20 via-cyan-400/10 to-transparent",
+              note: adminLoggedIn
+                ? "Everything currently visible on the student schedule."
+                : "All exams your account can access right now.",
+            },
+            {
+              label: "Upcoming Window",
+              value: counts.upcoming,
+              tone: "from-emerald-500/20 via-emerald-400/10 to-transparent",
+              note: counts.upcoming
+                ? "Upcoming or active exams waiting on the next action."
+                : "No new exams are scheduled yet.",
+            },
+            {
+              label: "Completed",
+              value: counts.completed,
+              tone: "from-amber-500/20 via-amber-400/10 to-transparent",
+              note: adminLoggedIn
+                ? "Completed exams can be reviewed or updated from here."
+                : "Your finished exams stay here for quick result access.",
+            },
+          ].map((card, index) => (
+            <div
+              key={card.label}
+              className="exam-schedule-stat-card exam-schedule-fade relative overflow-hidden rounded-[24px] px-5 py-5"
+              style={{ animationDelay: `${0.07 * (index + 1)}s` }}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${card.tone}`} />
+              <div className="relative z-10">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  {card.label}
+                </p>
+                <p className="mt-3 text-4xl font-black tracking-[-0.05em] text-white">
+                  {card.value}
+                </p>
+                <p className="exam-schedule-muted mt-3 text-sm leading-6">{card.note}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+
         {feedback && (
           <div
             className={[
               "mb-6 rounded-[18px] border px-5 py-4 text-sm",
               feedback.type === "error"
-                ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
-                : "border-emerald-500/30 bg-emerald-500/10 text-emerald-200",
+                ? "exam-schedule-feedback exam-schedule-feedback--error text-rose-200"
+                : "exam-schedule-feedback exam-schedule-feedback--success text-emerald-200",
             ].join(" ")}
           >
             {feedback.text}
@@ -206,15 +267,15 @@ export default function ExamSchedulePage() {
                 type="button"
                 onClick={() => setFilter(item.label)}
                 className={[
-                  "slms-fade-up inline-flex items-center gap-3 rounded-full border px-5 py-2.5 text-sm font-medium transition-all",
+                  "exam-schedule-fade inline-flex items-center gap-3 rounded-full px-5 py-2.5 text-sm font-medium transition-all",
                   active
-                    ? "border-cyan-400/35 bg-cyan-400/10 text-cyan-100 shadow-[0_0_0_1px_rgba(34,211,238,0.12)]"
-                    : "border-white/8 bg-[rgba(10,21,35,0.8)] text-slate-300 hover:border-white/15 hover:text-white",
+                    ? "exam-schedule-filter exam-schedule-filter--active text-cyan-100"
+                    : "exam-schedule-filter text-slate-300 hover:text-white",
                 ].join(" ")}
                 style={{ animationDelay: `${0.08 * (index + 1)}s` }}
               >
                 <span>{item.label}</span>
-                <span className="rounded-full bg-white/6 px-2 py-0.5 text-xs text-inherit">
+                <span className="exam-schedule-filter-count rounded-full px-2 py-0.5 text-xs text-inherit">
                   {item.count}
                 </span>
               </button>
@@ -229,21 +290,26 @@ export default function ExamSchedulePage() {
         )}
 
         {error && (
-          <div className="rounded-[18px] border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-200">
+          <div className="exam-schedule-feedback exam-schedule-feedback--error rounded-[18px] px-5 py-4 text-sm text-rose-200">
             {error}
           </div>
         )}
 
         {!loading && !error && filteredExams.length === 0 && (
-          <div className="slms-card rounded-[24px] px-6 py-8">
-            <p className="slms-muted">No exams found for this filter yet.</p>
+          <div className="exam-schedule-empty rounded-[24px] px-6 py-8">
+            <p className="text-lg font-semibold text-white">No exams found for this filter yet.</p>
+            <p className="exam-schedule-muted mt-3 max-w-2xl text-sm leading-6">
+              {filter === "All"
+                ? "As soon as an admin publishes an exam, it will appear here with the date, duration, and start action."
+                : `There are no ${filter.toLowerCase()} exams matching your current schedule view.`}
+            </p>
             {adminLoggedIn ? (
-              <p className="mt-4 text-xs slms-muted">
+              <p className="exam-schedule-muted mt-4 text-xs">
                 Admin kenek top right `Create Exam` button eken timed exam ekak create kalama me
                 list ekata penne.
               </p>
             ) : (
-              <p className="mt-4 text-xs slms-muted">
+              <p className="exam-schedule-muted mt-4 text-xs">
                 Admin kenek exam create karama me page eke penne.
               </p>
             )}
@@ -267,11 +333,11 @@ export default function ExamSchedulePage() {
             return (
               <article
                 key={exam._id}
-                className="slms-card slms-hover-lift slms-fade-up flex flex-col gap-5 rounded-[26px] px-5 py-5 lg:flex-row lg:items-center lg:justify-between"
+                className="exam-schedule-card exam-schedule-fade flex flex-col gap-5 rounded-[26px] px-5 py-5 lg:flex-row lg:items-center lg:justify-between"
                 style={{ animationDelay: `${0.08 * ((index % 6) + 1)}s` }}
               >
                 <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-5">
-                  <div className="flex h-[84px] w-[78px] shrink-0 flex-col items-center justify-center rounded-[18px] border border-white/10 bg-[#0c1d31] text-center">
+                  <div className="exam-schedule-date flex h-[84px] w-[78px] shrink-0 flex-col items-center justify-center rounded-[18px] text-center">
                     <span className="text-xs font-black tracking-[0.18em] text-cyan-200">
                       {dateBlock.month}
                     </span>
@@ -284,10 +350,13 @@ export default function ExamSchedulePage() {
                     <h2 className="truncate text-[1.75rem] font-semibold tracking-[-0.04em] text-white">
                       {exam.title}
                     </h2>
-                    <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm slms-muted">
+                    <p className="mt-2 text-sm text-slate-400">
+                      {formatFullDate(exam.scheduledAt || exam.createdAt)}
+                    </p>
+                    <div className="exam-schedule-muted mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                       <span className="inline-flex items-center gap-1.5">
                         <BookOpen className="h-4 w-4 text-cyan-300" />
-                        {formatSemesterLabel(exam.semester)} · {exam.subject}
+                        {formatSemesterLabel(exam.semester)} - {exam.subject}
                       </span>
                       <span className="inline-flex items-center gap-1.5">
                         <Clock3 className="h-4 w-4 text-cyan-300" />
@@ -359,10 +428,10 @@ export default function ExamSchedulePage() {
                       className={[
                         "rounded-[16px] px-5 py-3 text-sm font-semibold transition",
                         hasSubmitted
-                          ? "border border-white/10 bg-transparent text-slate-300 hover:bg-white/5 hover:text-white"
+                          ? "exam-schedule-secondary-btn text-slate-300 hover:text-white"
                           : examStarted
-                            ? "slms-primary-btn text-white"
-                          : "cursor-not-allowed border border-amber-500/20 bg-amber-500/10 text-amber-100",
+                            ? "exam-schedule-primary-btn text-white"
+                          : "exam-schedule-soon-btn cursor-not-allowed text-amber-100",
                       ].join(" ")}
                     >
                       {actionLabel}
@@ -377,7 +446,7 @@ export default function ExamSchedulePage() {
 
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020617]/75 px-4">
-          <div className="w-full max-w-md rounded-[26px] border border-white/10 bg-[#10192a] p-6 shadow-2xl">
+          <div className="exam-schedule-modal w-full max-w-md rounded-[26px] p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold text-white">Delete Exam?</h2>
@@ -389,7 +458,7 @@ export default function ExamSchedulePage() {
               <button
                 type="button"
                 onClick={() => setDeleteTarget(null)}
-                className="rounded-full border border-white/10 p-2 text-slate-300 transition hover:bg-white/5 hover:text-white"
+                className="exam-schedule-icon-btn rounded-full p-2 text-slate-300 transition hover:text-white"
                 disabled={deleteLoading}
               >
                 <X className="h-4 w-4" />
@@ -401,7 +470,7 @@ export default function ExamSchedulePage() {
                 type="button"
                 onClick={() => setDeleteTarget(null)}
                 disabled={deleteLoading}
-                className="rounded-[14px] border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white disabled:opacity-60"
+                className="exam-schedule-secondary-btn rounded-[14px] px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:text-white disabled:opacity-60"
               >
                 Cancel
               </button>

@@ -1,3 +1,37 @@
+export function parseSemesterValue(value) {
+  if (value == null) return null;
+
+  const raw = String(value).trim();
+  if (!raw) return null;
+
+  const direct = Number(raw);
+  if (Number.isFinite(direct) && direct >= 1) {
+    return Math.min(8, Math.floor(direct));
+  }
+
+  const lower = raw.toLowerCase();
+  const yearMatch = lower.match(/(\d+)\s*(st|nd|rd|th)?\s*year/);
+  const semMatch = lower.match(/(\d+)\s*(st|nd|rd|th)?\s*semester/);
+
+  if (yearMatch && semMatch) {
+    const year = Number(yearMatch[1]);
+    const semOfYear = Number(semMatch[1]);
+    if (Number.isFinite(year) && Number.isFinite(semOfYear) && year >= 1 && semOfYear >= 1 && semOfYear <= 2) {
+      const overall = (year - 1) * 2 + semOfYear;
+      return Math.min(8, overall);
+    }
+  }
+
+  if (semMatch) {
+    const semNumber = Number(semMatch[1]);
+    if (Number.isFinite(semNumber) && semNumber >= 1) {
+      return Math.min(8, semNumber);
+    }
+  }
+
+  return null;
+}
+
 export function formatSemesterLabel(value) {
   const semesterNumber = Number(value);
   if (!Number.isFinite(semesterNumber) || semesterNumber < 1 || semesterNumber > 8) {
@@ -30,8 +64,8 @@ export function getSemesterOptions(maxSemesterValue = 8) {
 }
 
 export function canAccessSemesterOption(userSemesterValue, optionSemesterValue) {
-  const userSemester = Number(userSemesterValue);
-  const optionSemester = Number(optionSemesterValue);
+  const userSemester = parseSemesterValue(userSemesterValue);
+  const optionSemester = parseSemesterValue(optionSemesterValue);
 
   if (!Number.isFinite(userSemester) || !Number.isFinite(optionSemester)) {
     return false;

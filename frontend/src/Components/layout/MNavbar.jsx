@@ -7,8 +7,22 @@ import { Menu, X, LogOut, LayoutDashboard, Shield, User, GraduationCap, Sun, Moo
 const ThemeToggle = () => {
   const { dark, toggle } = useTheme();
   return (
-    <button onClick={toggle} className={`theme-toggle ${dark ? 'theme-toggle-dark' : 'theme-toggle-light'}`} title={dark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
-      <div className={`theme-toggle-knob ${dark ? 'theme-toggle-knob-right' : 'theme-toggle-knob-left'}`}>
+    <button
+      onClick={toggle}
+      title={dark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      className={[
+        "relative h-7 w-[3.25rem] rounded-full border transition-all duration-300",
+        dark
+          ? "border-indigo-400/40 bg-gradient-to-r from-indigo-600 to-indigo-500"
+          : "border-amber-400/40 bg-gradient-to-r from-amber-400 to-orange-400",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "absolute top-[2px] flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300",
+          dark ? "left-[calc(100%-1.6rem)]" : "left-[2px]",
+        ].join(" ")}
+      >
         {dark ? <Moon className="w-3 h-3 text-indigo-500" /> : <Sun className="w-3 h-3 text-amber-500" />}
       </div>
     </button>

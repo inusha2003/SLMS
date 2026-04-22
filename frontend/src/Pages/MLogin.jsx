@@ -50,24 +50,29 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 px-4 py-12">
+      <div className="mx-auto flex min-h-[calc(100vh-10rem)] w-full max-w-md items-center">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-lms-accent rounded-2xl mb-4">
+          <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-md shadow-blue-600/20">
             <GraduationCap className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold">Welcome Back</h1>
-          <p className="mt-2 text-gray-400 text-sm">Sign in to your SmartLMS account</p>
+          <h1 className="text-3xl font-extrabold text-slate-900">Welcome Back</h1>
+          <p className="mt-2 text-sm text-slate-600">Sign in to your SmartLMS account</p>
         </div>
 
-        <div className="card">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Email Address</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Email Address</label>
               <input
                 type="email"
                 placeholder="you@example.com"
-                className={`input-field ${errors.email ? 'input-error' : ''}`}
+                className={`w-full rounded-xl border px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                  errors.email
+                    ? 'border-red-300 focus:border-red-400 focus:ring-red-200'
+                    : 'border-slate-200 focus:border-blue-400 focus:ring-blue-200'
+                }`}
                 {...register('email', {
                   required: 'Email is required',
                   pattern: {
@@ -80,12 +85,16 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
               <div className="relative">
                 <input
                   type={showPw ? 'text' : 'password'}
                   placeholder="Enter your password"
-                  className={`input-field pr-12 ${errors.password ? 'input-error' : ''}`}
+                  className={`w-full rounded-xl border px-3 py-2.5 pr-12 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                    errors.password
+                      ? 'border-red-300 focus:border-red-400 focus:ring-red-200'
+                      : 'border-slate-200 focus:border-blue-400 focus:ring-blue-200'
+                  }`}
                   {...register('password', {
                     required: 'Password is required',
                     minLength: { value: 6, message: 'Minimum 6 characters' },
@@ -94,7 +103,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-lms-muted hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-blue-600"
                 >
                   {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -102,13 +111,14 @@ const Login = () => {
               {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>}
             </div>
 
-            <button type="submit" disabled={submitting} className="btn-primary w-full !py-3.5 text-base">
+            <button type="submit" disabled={submitting} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60">
               {submitting ? <Spinner size="sm" /> : <><LogIn className="w-5 h-5" /> Sign In</>}
             </button>
           </form>
 
           
         </div>
+      </div>
       </div>
     </div>
   );
