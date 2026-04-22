@@ -218,7 +218,7 @@ export default function FlashcardDecksPage() {
               <div>
                 <h2 className="text-xl font-semibold text-white">Delete Flashcard Deck?</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
-                  Are you sure you want to delete "{deleteTarget.title}"?
+                  Are you sure you want to delete?
                 </p>
               </div>
               <button
@@ -238,7 +238,7 @@ export default function FlashcardDecksPage() {
                 disabled={deleteLoading}
                 className="rounded-[14px] border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white disabled:opacity-60"
               >
-                Cancel
+                No
               </button>
               <button
                 type="button"
@@ -247,7 +247,7 @@ export default function FlashcardDecksPage() {
                 className="inline-flex items-center gap-2 rounded-[14px] bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-500 disabled:opacity-60"
               >
                 {deleteLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                {deleteLoading ? "Deleting..." : "Yes, Delete"}
+                {deleteLoading ? "Deleting..." : "Yes"}
               </button>
             </div>
           </div>

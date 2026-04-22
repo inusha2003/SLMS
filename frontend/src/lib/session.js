@@ -14,6 +14,38 @@ const parseSessionAuth = () => safeJsonParse(sessionStorage.getItem(AUTH_KEY));
 
 const parseLmsUser = () => safeJsonParse(localStorage.getItem(LMS_USER_KEY));
 
+function parseOverallSemester(userLike) {
+  if (!userLike || typeof userLike !== "object") return "";
+
+  const directSemester = Number(userLike.semester);
+  if (Number.isFinite(directSemester) && directSemester >= 1) {
+    return String(Math.min(8, Math.floor(directSemester)));
+  }
+
+  const academicYearLabel = String(userLike.academicYear || "").trim().toLowerCase();
+  const semesterLabel = String(userLike.semester || "").trim().toLowerCase();
+
+  const yearMatch = academicYearLabel.match(/^(\d+)/);
+  const semesterMatch = semesterLabel.match(/^(\d+)/);
+
+  if (!yearMatch || !semesterMatch) return "";
+
+  const year = Number(yearMatch[1]);
+  const semesterOfYear = Number(semesterMatch[1]);
+
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(semesterOfYear) ||
+    year < 1 ||
+    year > 4 ||
+    ![1, 2].includes(semesterOfYear)
+  ) {
+    return "";
+  }
+
+  return String((year - 1) * 2 + semesterOfYear);
+}
+
 function decodeJwtPayload(token) {
   if (!token || typeof token !== "string") return null;
   try {
@@ -55,11 +87,11 @@ export const getStoredUserRole = () => {
 
 export const getStoredUserSemester = () => {
   const u = parseLmsUser();
-  if (u != null && u.semester != null && u.semester !== "")
-    return String(u.semester);
+  const normalizedUserSemester = parseOverallSemester(u);
+  if (normalizedUserSemester) return normalizedUserSemester;
   const auth = parseSessionAuth();
-  if (auth != null && auth.semester != null && auth.semester !== "")
-    return String(auth.semester);
+  const normalizedAuthSemester = parseOverallSemester(auth);
+  if (normalizedAuthSemester) return normalizedAuthSemester;
   return "";
 };
 

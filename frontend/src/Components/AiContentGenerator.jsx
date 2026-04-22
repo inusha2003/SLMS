@@ -14,7 +14,11 @@ import {
 } from "lucide-react";
 import { apiUrl } from "../lib/api.js";
 import { getAuthHeaders, getStoredUserSemester, isLoggedIn } from "../lib/session.js"; // register user accesss validation
-import { canAccessSemesterOption, getSemesterOptions } from "../lib/semester.js";
+import {
+  canAccessSemesterOption,
+  getSemesterOptions,
+  parseSemesterValue,
+} from "../lib/semester.js";
 
 const CONTENT_TYPES = [
   {
@@ -174,6 +178,10 @@ export default function AiContentGenerator() {
   const displayTopic = result?.meta?.topic || topic || "Topic";
   const displaySubject = result?.meta?.subject || subject;
   const displaySemester = result?.meta?.semester || semester;
+  const resolvedSaveSemester =
+    parseSemesterValue(result?.meta?.semester) ??
+    parseSemesterValue(semester) ??
+    parseSemesterValue(storedUserSemester);
   const parsedNotes = useMemo(() => {
     if (result?.kind !== "notes" || !result.data?.markdown) {
       return { intro: [], sections: [] };
@@ -277,6 +285,11 @@ export default function AiContentGenerator() {
       return;
     }
 
+    if (!Number.isFinite(resolvedSaveSemester)) {
+      setError("Could not determine a valid semester for this flashcard deck.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(apiUrl("/api/content/flashcard-decks"), {
@@ -287,7 +300,7 @@ export default function AiContentGenerator() {
         body: JSON.stringify({
           title: displayTopic || "AI Flashcards",
           subject: displaySubject || "Uploaded Lesson",
-          semester: Number(displaySemester) || 1,
+          semester: resolvedSaveSemester,
           cards: result.data.cards,
           isAiGenerated: true,
         }),
