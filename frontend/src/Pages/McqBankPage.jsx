@@ -25,8 +25,6 @@ import {
   parseSemesterValue,
 } from "../lib/semester.js";
 
-const SEMESTER_OPTIONS = getSemesterOptions();
-
 function validateSearchQuery(value) {
   const trimmed = String(value || "").trim().replace(/\s+/g, " ");
   if (!trimmed) {
@@ -96,6 +94,7 @@ export default function McqBankPage() {
   const adminLoggedIn = useMemo(() => isAdminLoggedIn(), []);
   const storedUserRole = useMemo(() => getStoredUserRole(), []);
   const storedUserSemester = useMemo(() => getStoredUserSemester(), []);
+  const semesterOptions = useMemo(() => getSemesterOptions(), []);
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
@@ -285,7 +284,7 @@ export default function McqBankPage() {
                   className="slms-input w-full appearance-none rounded-[16px] px-4 py-3.5 pr-11 text-sm text-white focus:outline-none"
                 >
                   <option value="">All Semesters</option>
-                  {SEMESTER_OPTIONS.map((option) => (
+                  {semesterOptions.map((option) => (
                     <option
                       key={option.value}
                       value={option.value}

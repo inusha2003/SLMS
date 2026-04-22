@@ -40,8 +40,54 @@ function requireStudent(req, res, next) {
   return next();
 }
 
+function normalizeStudentSemester(userOrValue) {
+  const directSemester =
+    typeof userOrValue === "object" && userOrValue !== null
+      ? Number(userOrValue.semester)
+      : Number(userOrValue);
+  if (Number.isFinite(directSemester) && directSemester >= 1) {
+    return Math.floor(directSemester);
+  }
+
+  const academicYearLabel =
+    typeof userOrValue === "object" && userOrValue !== null
+      ? String(userOrValue.academicYear || "").trim().toLowerCase()
+      : "";
+  const semesterLabel =
+    typeof userOrValue === "object" && userOrValue !== null
+      ? String(userOrValue.semester || "").trim().toLowerCase()
+      : String(userOrValue || "").trim().toLowerCase();
+
+  const yearMatch = academicYearLabel.match(/^(\d+)/);
+  const semesterMatch = semesterLabel.match(/^(\d+)/);
+
+  if (yearMatch && semesterMatch) {
+    const year = Number(yearMatch[1]);
+    const semesterOfYear = Number(semesterMatch[1]);
+    if (
+      Number.isFinite(year) &&
+      Number.isFinite(semesterOfYear) &&
+      year >= 1 &&
+      semesterOfYear >= 1 &&
+      semesterOfYear <= 2
+    ) {
+      return (year - 1) * 2 + semesterOfYear;
+    }
+  }
+
+  const fallbackSemesterMatch = semesterLabel.match(/(\d+)/);
+  if (fallbackSemesterMatch) {
+    const semesterNumber = Number(fallbackSemesterMatch[1]);
+    if (Number.isFinite(semesterNumber) && semesterNumber >= 1) {
+      return Math.min(8, Math.floor(semesterNumber));
+    }
+  }
+
+  return null;
+}
+
 function canStudentAccessSemester(studentSemesterValue, deckSemesterValue) {
-  const studentSemester = Number(studentSemesterValue);
+  const studentSemester = normalizeStudentSemester(studentSemesterValue);
   const deckSemester = Number(deckSemesterValue);
 
   if (!Number.isFinite(studentSemester) || !Number.isFinite(deckSemester)) {
@@ -62,7 +108,7 @@ router.get("/", attachUser, requireStudent, async (req, res) => {
     if (semester !== undefined && semester !== "") {
       const n = Number(semester);
       if (Number.isFinite(n) && n >= 1) {
-        if (!canStudentAccessSemester(req.user?.semester, n)) {
+        if (!canStudentAccessSemester(req.user, n)) {
           return res.status(403).json({
             message: "You cannot filter flashcards beyond your registered semester.",
           });
@@ -72,7 +118,7 @@ router.get("/", attachUser, requireStudent, async (req, res) => {
     }
 
     let decks = await FlashcardDeck.find(filter).sort({ createdAt: -1 }).lean();
-    decks = decks.filter((deck) => canStudentAccessSemester(req.user?.semester, deck.semester));
+    decks = decks.filter((deck) => canStudentAccessSemester(req.user, deck.semester));
 
     if (q && String(q).trim()) {
       const term = String(q).trim().toLowerCase();
@@ -111,7 +157,7 @@ router.get("/:deckId", attachUser, requireStudent, async (req, res) => {
       createdBy: req.user._id,
     }).lean();
     if (!deck) return res.status(404).json({ message: "Deck not found." });
-    if (!canStudentAccessSemester(req.user?.semester, deck.semester)) {
+    if (!canStudentAccessSemester(req.user, deck.semester)) {
       return res.status(403).json({
         message: "You do not have access to this flashcard deck for your current semester.",
       });

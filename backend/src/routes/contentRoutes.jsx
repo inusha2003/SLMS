@@ -79,8 +79,54 @@ function requireStudent(req, res, next) {
   return next();
 }
 
+function normalizeStudentSemester(userOrValue) {
+  const directSemester =
+    typeof userOrValue === "object" && userOrValue !== null
+      ? Number(userOrValue.semester)
+      : Number(userOrValue);
+  if (Number.isFinite(directSemester) && directSemester >= 1) {
+    return Math.floor(directSemester);
+  }
+
+  const academicYearLabel =
+    typeof userOrValue === "object" && userOrValue !== null
+      ? String(userOrValue.academicYear || "").trim().toLowerCase()
+      : "";
+  const semesterLabel =
+    typeof userOrValue === "object" && userOrValue !== null
+      ? String(userOrValue.semester || "").trim().toLowerCase()
+      : String(userOrValue || "").trim().toLowerCase();
+
+  const yearMatch = academicYearLabel.match(/^(\d+)/);
+  const semesterMatch = semesterLabel.match(/^(\d+)/);
+
+  if (yearMatch && semesterMatch) {
+    const year = Number(yearMatch[1]);
+    const semesterOfYear = Number(semesterMatch[1]);
+    if (
+      Number.isFinite(year) &&
+      Number.isFinite(semesterOfYear) &&
+      year >= 1 &&
+      semesterOfYear >= 1 &&
+      semesterOfYear <= 2
+    ) {
+      return (year - 1) * 2 + semesterOfYear;
+    }
+  }
+
+  const fallbackSemesterMatch = semesterLabel.match(/(\d+)/);
+  if (fallbackSemesterMatch) {
+    const semesterNumber = Number(fallbackSemesterMatch[1]);
+    if (Number.isFinite(semesterNumber) && semesterNumber >= 1) {
+      return Math.min(8, Math.floor(semesterNumber));
+    }
+  }
+
+  return null;
+}
+
 function canStudentAccessSemester(studentSemesterValue, contentSemesterValue) {
-  const studentSemester = Number(studentSemesterValue);
+  const studentSemester = normalizeStudentSemester(studentSemesterValue);
   const contentSemester = Number(contentSemesterValue);
 
   if (!Number.isFinite(studentSemester) || !Number.isFinite(contentSemester)) {
@@ -136,7 +182,7 @@ router.post("/flashcard-decks", attachUser, requireStudent, async (req, res) => 
       });
     }
 
-    if (!canStudentAccessSemester(req.user?.semester, semNum)) {
+    if (!canStudentAccessSemester(req.user, semNum)) {
       return res.status(403).json({
         message: "You cannot save flashcards for a semester beyond your registered semester.",
       });
