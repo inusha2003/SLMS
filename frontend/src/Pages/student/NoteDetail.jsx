@@ -17,11 +17,12 @@ const NoteDetail = () => {
   const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
   useEffect(() => {
-    noteApi.getById(id)
+    noteApi
+      .getById(id)
       .then((res) => setNote(res.data.data))
       .catch(() => navigate(-1))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) return <LoadingSpinner />;
   if (!note) return null;
@@ -29,78 +30,90 @@ const NoteDetail = () => {
   const fullFileUrl = note.fileUrl?.startsWith('http') ? note.fileUrl : `${baseUrl}${note.fileUrl}`;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-6xl">
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-white"
+        className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-slate-300 transition-colors hover:border-indigo-400/40 hover:text-white"
       >
         <FiArrowLeft size={16} />
         Back
       </button>
 
-      <div className="card mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-white mb-1">{note.title}</h1>
-            <p className="text-slate-400 text-sm">{note.subject} • {note.moduleCode}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge status={note.status} />
-            <Badge status={note.visibility} />
-          </div>
-        </div>
+      <section className="relative mb-10 overflow-hidden rounded-[32px] border border-white/10 bg-[#09111f] px-8 py-8 shadow-[0_32px_80px_rgba(2,6,23,0.45)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.16),transparent_58%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_52%)]" />
 
-        {note.description && (
-          <p className="text-slate-300 text-sm mb-4 leading-relaxed">{note.description}</p>
-        )}
-
-        {note.tags?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {note.tags.map((tag) => (
-              <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-lms-primary/20 text-lms-secondary border border-lms-primary/30 rounded-full text-xs">
-                <FiTag size={10} />
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
-          <span className="flex items-center gap-1">
-            <FiClock size={11} />
-            {formatDate(note.createdAt)}
-          </span>
-          <span className="flex items-center gap-1">
-            <FiEye size={11} />
-            {note.viewCount} views
-          </span>
-        </div>
-
-        {note.fileUrl && (
-          <div className="flex items-center gap-3 p-4 bg-lms-darkest rounded-lg border border-lms-primary/20">
-            <FiFile className="text-lms-secondary" size={20} />
-            <div className="flex-1">
-              <p className="text-white text-sm font-medium">{note.fileName || 'Attached File'}</p>
-              <p className="text-slate-500 text-xs">{note.fileType}</p>
+        <div className="relative flex flex-col gap-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">{note.title}</h1>
+              <p className="mt-2 text-lg text-slate-400">{note.subject} • {note.moduleCode}</p>
+              {note.description && (
+                <p className="mt-7 max-w-2xl text-base leading-8 text-slate-300">{note.description}</p>
+              )}
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPreviewOpen(true)}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-lms-secondary border border-lms-secondary/50 rounded-lg hover:bg-lms-secondary/20 transition-colors"
-              >
-                <FiEye size={12} /> Preview
-              </button>
-              <a
-                href={fullFileUrl}
-                download={note.fileName}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-white bg-lms-primary rounded-lg hover:bg-lms-secondary transition-colors"
-              >
-                <FiDownload size={12} /> Download
-              </a>
+            <div className="flex items-center gap-3 self-start">
+              <Badge status={note.status} />
+              <Badge status={note.visibility} />
             </div>
           </div>
-        )}
-      </div>
+
+          {note.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {note.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-slate-200"
+                >
+                  <FiTag size={12} className="text-indigo-300" />
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
+            <span className="inline-flex items-center gap-2">
+              <FiClock size={14} className="text-indigo-300" />
+              {formatDate(note.createdAt)}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <FiEye size={14} className="text-cyan-300" />
+              {note.viewCount} views
+            </span>
+          </div>
+
+          {note.fileUrl && (
+            <div className="rounded-[28px] border border-white/10 bg-[#070d18]/95 p-5 shadow-[0_24px_60px_rgba(2,6,23,0.3)]">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                <div className="flex min-w-0 flex-1 items-center gap-4">
+                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-100">
+                    <FiFile size={24} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xl font-bold text-white">{note.fileName || 'Attached File'}</p>
+                    <p className="mt-1 text-sm text-slate-400">{note.fileType}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => setPreviewOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-cyan-400/40 hover:bg-cyan-400/10"
+                  >
+                    <FiEye size={14} /> Preview
+                  </button>
+                  <a
+                    href={fullFileUrl}
+                    download={note.fileName}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-indigo-500/40 bg-indigo-500/10 px-5 py-3 text-sm font-semibold text-indigo-100 transition-colors hover:bg-indigo-500/20"
+                  >
+                    <FiDownload size={14} /> Download
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       <CommentSection noteId={note._id} />
 

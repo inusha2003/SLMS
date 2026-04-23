@@ -2,6 +2,7 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import { adminOnly, adminOrStudent } from '../middlewares/rbacMiddleware.js';
 import upload from '../middlewares/uploadMiddleware.js';
+import commentRoutes from './commentRoutes.js';
 import {
   createNote,
   getNotes,
@@ -16,6 +17,7 @@ import {
 const router = express.Router();
 
 router.use(authMiddleware);
+router.use('/:noteId/comments', commentRoutes);
 
 router.get('/my', getMyNotes); // Student: own notes
 router.get('/pending', adminOnly, getPendingNotes); // Admin only

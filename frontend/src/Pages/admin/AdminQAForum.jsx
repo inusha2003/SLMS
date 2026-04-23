@@ -1,29 +1,36 @@
 import { useState, useEffect, useCallback } from 'react';
 import { qaApi } from '../../api/qaApi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import AnswerItem from '../../components/qa/AnswerItem';
 import Pagination from '../../components/common/Pagination';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import {
-  FiSearch, FiTrash2, FiMessageSquare, FiArrowLeft,
-  FiArrowUp, FiTag, FiEye, FiClock, FiCheck,
-  FiChevronRight, FiAlertTriangle, FiSend, FiX
+  FiSearch,
+  FiTrash2,
+  FiMessageSquare,
+  FiArrowLeft,
+  FiArrowUp,
+  FiTag,
+  FiEye,
+  FiClock,
+  FiCheck,
+  FiChevronRight,
+  FiAlertTriangle,
+  FiSend,
+  FiX,
 } from 'react-icons/fi';
 import { timeAgo } from '../../utils/formatDate';
 import useAuth from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
 
-// ── Question Detail View (Admin) ──────────────────────────────────────────────
 const AdminQuestionDetail = ({ questionId, onBack }) => {
   const { user } = useAuth();
-  const [data, setData]               = useState(null);
-  const [loading, setLoading]         = useState(true);
-  const [answerText, setAnswerText]   = useState('');
-  const [posting, setPosting]         = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [answerText, setAnswerText] = useState('');
+  const [posting, setPosting] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ open: false, type: '', id: '' });
   const [reportModal, setReportModal] = useState({ open: false, id: '' });
   const [reportReason, setReportReason] = useState('');
-  const [editAnswer, setEditAnswer]   = useState({ id: '', body: '' });
 
   const fetchData = useCallback(async () => {
     try {
@@ -36,11 +43,12 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
     } finally {
       setLoading(false);
     }
-  }, [questionId]);
+  }, [questionId, onBack]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  // ── Admin post answer ────────────────────────────────────────────────────────
   const handlePostAnswer = async () => {
     if (!answerText.trim()) {
       toast.error('Answer cannot be empty');
@@ -59,7 +67,6 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
     }
   };
 
-  // ── Delete question ──────────────────────────────────────────────────────────
   const handleDeleteQuestion = async () => {
     try {
       await qaApi.deleteQuestion(questionId);
@@ -71,7 +78,6 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
     }
   };
 
-  // ── Delete answer ────────────────────────────────────────────────────────────
   const handleDeleteAnswer = async () => {
     try {
       await qaApi.deleteAnswer(deleteModal.id);
@@ -83,7 +89,6 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
     }
   };
 
-  // ── Edit answer ──────────────────────────────────────────────────────────────
   const handleEditAnswer = async (answerId, body) => {
     try {
       await qaApi.updateAnswer(answerId, { body });
@@ -94,7 +99,6 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
     }
   };
 
-  // ── Upvote ───────────────────────────────────────────────────────────────────
   const handleUpvoteAnswer = async (answerId) => {
     try {
       await qaApi.upvoteAnswer(answerId);
@@ -104,7 +108,6 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
     }
   };
 
-  // ── Report ───────────────────────────────────────────────────────────────────
   const handleReport = async () => {
     if (!reportReason.trim()) {
       toast.error('Please provide a reason');
@@ -125,82 +128,56 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
   };
 
   if (loading) return <LoadingSpinner />;
-  if (!data)   return null;
+  if (!data) return null;
 
   const { question, answers } = data;
 
   return (
-    <div className="max-w-4xl mx-auto">
-
-      {/* ── Back button ── */}
+    <div className="mx-auto max-w-5xl">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-slate-400 hover:text-white
-                   transition-colors mb-6 text-sm group"
+        className="group mb-6 flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-white"
       >
-        <FiArrowLeft
-          size={16}
-          className="group-hover:-translate-x-0.5 transition-transform"
-        />
-        Back to Q&amp;A Forum
+        <FiArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
+        Back to Q&A Forum
       </button>
 
-      {/* ── Admin badge ── */}
-      <div className="flex items-center gap-2 mb-4">
-        <span
-          className="px-3 py-1 text-xs font-semibold bg-lms-secondary/30
-                     text-lms-secondary border border-lms-secondary/40
-                     rounded-full"
-        >
-          👮 Admin View — Full Moderation Rights
-        </span>
+      <div className="mb-4 inline-flex rounded-full border border-lms-secondary/40 bg-lms-secondary/20 px-3 py-1 text-xs font-semibold text-lms-secondary">
+        Admin View - Full Moderation Rights
       </div>
 
-      {/* ── Question card ── */}
-      <div className="card mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+      <div className="mb-6 rounded-[28px] border border-white/6 bg-[#2b2340] p-6 shadow-[0_24px_70px_rgba(9,10,24,0.18)]">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white mb-2 leading-snug">
-              {question.title}
-            </h1>
-            <div className="flex flex-wrap gap-2 mb-3">
-              <span
-                className="px-2 py-0.5 bg-lms-accent/30 text-lms-muted
-                           border border-lms-accent/30 rounded-full text-xs"
-              >
+            <h1 className="mb-2 text-2xl font-bold text-white">{question.title}</h1>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <span className="rounded-full border border-white/6 bg-white/[0.04] px-3 py-1 text-xs text-slate-400">
                 {question.subject}
               </span>
               {question.tags?.map((tag) => (
                 <span
                   key={tag}
-                  className="flex items-center gap-1 px-2 py-0.5
-                             bg-lms-primary/20 text-slate-400 rounded-full text-xs"
+                  className="flex items-center gap-1 rounded-full border border-white/6 bg-white/[0.04] px-3 py-1 text-xs text-slate-400"
                 >
-                  <FiTag size={9} /> {tag}
+                  <FiTag size={9} />
+                  {tag}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Delete question button (admin) */}
           <button
-            onClick={() =>
-              setDeleteModal({ open: true, type: 'question', id: question._id })
-            }
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/40
-                       text-red-400 border border-red-700/40 rounded-lg text-xs
-                       hover:bg-red-900/60 transition-colors flex-shrink-0"
+            onClick={() => setDeleteModal({ open: true, type: 'question', id: question._id })}
+            className="inline-flex items-center gap-2 rounded-2xl border border-red-500/18 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300 transition-all hover:bg-red-500/18"
           >
-            <FiTrash2 size={13} /> Delete Question
+            <FiTrash2 size={14} />
+            Delete Question
           </button>
         </div>
 
-        <p className="text-slate-300 text-sm leading-relaxed mb-4">
-          {question.body}
-        </p>
+        <p className="mb-4 text-sm leading-7 text-slate-300">{question.body}</p>
 
-        <div className="flex items-center gap-4 text-xs text-slate-500 pt-3
-                        border-t border-lms-primary/20">
+        <div className="flex flex-wrap items-center gap-4 border-t border-white/6 pt-4 text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <FiArrowUp size={11} /> {question.upvotes?.length || 0} upvotes
           </span>
@@ -210,26 +187,20 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
           <span className="flex items-center gap-1">
             <FiClock size={11} /> {timeAgo(question.createdAt)}
           </span>
-          <span className="text-lms-muted">by {question.authorName}</span>
+          <span>by {question.authorName}</span>
         </div>
       </div>
 
-      {/* ── Answers section ── */}
       <div className="mb-6">
-        <h2 className="text-white font-bold text-base mb-4 flex items-center gap-2">
+        <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-white">
           <FiMessageSquare className="text-lms-secondary" size={18} />
           {answers.length} Answer{answers.length !== 1 ? 's' : ''}
         </h2>
 
         {answers.length === 0 ? (
-          <div className="card text-center py-10">
-            <FiMessageSquare
-              className="mx-auto text-slate-600 mb-2"
-              size={28}
-            />
-            <p className="text-slate-400 text-sm">
-              No answers yet. Be the first to answer!
-            </p>
+          <div className="rounded-[24px] border border-white/6 bg-[#2b2340] px-6 py-10 text-center">
+            <FiMessageSquare className="mx-auto mb-2 text-slate-600" size={28} />
+            <p className="text-sm text-slate-400">No answers yet.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -237,11 +208,9 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
               <AdminAnswerCard
                 key={answer._id}
                 answer={answer}
-                questionAuthorId={question.author}
+                currentUserId={user?.userId}
                 onEdit={handleEditAnswer}
-                onDelete={(id) =>
-                  setDeleteModal({ open: true, type: 'answer', id })
-                }
+                onDelete={(id) => setDeleteModal({ open: true, type: 'answer', id })}
                 onUpvote={handleUpvoteAnswer}
                 onReport={(id) => {
                   setReportModal({ open: true, id });
@@ -253,45 +222,39 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
         )}
       </div>
 
-      {/* ── Admin Reply Box ── */}
-      <div className="card">
-        <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+      <div className="rounded-[28px] border border-white/6 bg-[#2b2340] p-6 shadow-[0_24px_70px_rgba(9,10,24,0.18)]">
+        <h3 className="mb-1 flex items-center gap-2 font-bold text-white">
           <FiSend className="text-lms-secondary" size={16} />
           Post an Answer
         </h3>
-        <p className="text-slate-500 text-xs mb-4">
-          As an admin, your answer will appear immediately.
-        </p>
+        <p className="mb-4 text-xs text-slate-500">As an admin, your answer will appear immediately.</p>
 
         <textarea
           value={answerText}
           onChange={(e) => setAnswerText(e.target.value)}
-          className="input-field resize-none mb-3"
+          className="mb-3 w-full resize-none rounded-2xl border border-white/10 bg-[#1f1830] px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-lms-secondary/30"
           rows={5}
           placeholder="Write a clear, helpful answer for students..."
         />
 
         <div className="flex items-center justify-between">
-          <span className="text-slate-600 text-xs">
-            {answerText.length} characters
-          </span>
+          <span className="text-xs text-slate-600">{answerText.length} characters</span>
           <div className="flex gap-2">
             {answerText && (
               <button
                 onClick={() => setAnswerText('')}
-                className="btn-secondary flex items-center gap-1.5 text-xs"
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-slate-300 transition-all hover:bg-white/[0.05] hover:text-white"
               >
-                <FiX size={13} /> Clear
+                Clear
               </button>
             )}
             <button
               onClick={handlePostAnswer}
               disabled={posting || !answerText.trim()}
-              className="btn-primary flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#6d63ff,#5b7cff)] px-5 py-2.5 text-sm font-medium text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {posting ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white
-                                rounded-full animate-spin" />
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               ) : (
                 <FiSend size={14} />
               )}
@@ -301,7 +264,6 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
         </div>
       </div>
 
-      {/* ── Delete Confirm Modal ── */}
       <ConfirmModal
         isOpen={deleteModal.open}
         title={`Delete ${deleteModal.type === 'question' ? 'Question' : 'Answer'}`}
@@ -310,38 +272,28 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
             ? 'Are you sure you want to delete this question and all its answers? This action cannot be undone.'
             : 'Are you sure you want to delete this answer? This action cannot be undone.'
         }
-        onConfirm={
-          deleteModal.type === 'question'
-            ? handleDeleteQuestion
-            : handleDeleteAnswer
-        }
+        onConfirm={deleteModal.type === 'question' ? handleDeleteQuestion : handleDeleteAnswer}
         onCancel={() => setDeleteModal({ open: false, type: '', id: '' })}
         confirmText="Delete"
         danger
       />
 
-      {/* ── Report Modal ── */}
       {reportModal.open && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center
-                        justify-center backdrop-blur-sm">
-          <div className="bg-lms-dark border border-lms-primary/30 rounded-xl
-                          p-6 w-full max-w-sm mx-4 shadow-2xl">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-sm rounded-2xl border border-white/10 bg-[#241d35] p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-2">
               <FiAlertTriangle className="text-orange-400" size={18} />
-              <h3 className="text-white font-bold">Report Answer</h3>
+              <h3 className="font-bold text-white">Report Answer</h3>
             </div>
             <textarea
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
-              className="input-field resize-none mb-4"
+              className="mb-4 w-full resize-none rounded-2xl border border-white/10 bg-[#1f1830] px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-orange-400/30"
               rows={3}
               placeholder="Describe why this answer is inappropriate..."
             />
             <div className="flex gap-2">
-              <button
-                onClick={handleReport}
-                className="btn-danger flex-1"
-              >
+              <button onClick={handleReport} className="flex-1 rounded-2xl border border-red-500/18 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300 transition-all hover:bg-red-500/18">
                 Submit Report
               </button>
               <button
@@ -349,7 +301,7 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
                   setReportModal({ open: false, id: '' });
                   setReportReason('');
                 }}
-                className="btn-secondary flex-1"
+                className="flex-1 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-slate-300 transition-all hover:bg-white/[0.05] hover:text-white"
               >
                 Cancel
               </button>
@@ -361,21 +313,12 @@ const AdminQuestionDetail = ({ questionId, onBack }) => {
   );
 };
 
-// ── Admin Answer Card ─────────────────────────────────────────────────────────
-const AdminAnswerCard = ({
-  answer,
-  questionAuthorId,
-  onEdit,
-  onDelete,
-  onUpvote,
-  onReport,
-}) => {
-  const { user } = useAuth();
-  const [showEdit, setShowEdit]   = useState(false);
-  const [editBody, setEditBody]   = useState(answer.body);
-  const [saving, setSaving]       = useState(false);
+const AdminAnswerCard = ({ answer, currentUserId, onEdit, onDelete, onUpvote, onReport }) => {
+  const [showEdit, setShowEdit] = useState(false);
+  const [editBody, setEditBody] = useState(answer.body);
+  const [saving, setSaving] = useState(false);
 
-  const isUpvoted = answer.upvotes?.includes(user?.userId);
+  const isUpvoted = Array.isArray(answer.upvotes) && answer.upvotes.includes(currentUserId);
 
   const handleSaveEdit = async () => {
     if (!editBody.trim()) return;
@@ -387,116 +330,79 @@ const AdminAnswerCard = ({
 
   return (
     <div
-      className={`rounded-xl p-5 border transition-colors ${
+      className={`rounded-[24px] border p-5 ${
         answer.isAccepted
-          ? 'bg-green-900/10 border-green-700/40'
+          ? 'border-green-700/40 bg-green-900/10'
           : answer.isReported
-          ? 'bg-orange-900/10 border-orange-700/30'
-          : 'bg-lms-darkest border-lms-primary/20'
+            ? 'border-orange-700/30 bg-orange-900/10'
+            : 'border-white/6 bg-[#2b2340]'
       }`}
     >
-      {/* Accepted badge */}
       {answer.isAccepted && (
-        <div className="flex items-center gap-1.5 mb-3">
-          <span
-            className="flex items-center gap-1.5 px-3 py-1 bg-green-900/30
-                       border border-green-700/40 rounded-full text-xs
-                       text-green-400 font-medium"
-          >
-            <FiCheck size={12} /> Accepted Answer
-          </span>
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-green-700/40 bg-green-900/30 px-3 py-1 text-xs font-medium text-green-400">
+          <FiCheck size={12} />
+          Accepted Answer
         </div>
       )}
 
-      {/* Reported badge */}
       {answer.isReported && (
-        <div className="flex items-center gap-1.5 mb-3">
-          <span
-            className="flex items-center gap-1.5 px-3 py-1 bg-orange-900/30
-                       border border-orange-700/40 rounded-full text-xs
-                       text-orange-400 font-medium"
-          >
-            <FiAlertTriangle size={12} /> Reported — {answer.reportReason}
-          </span>
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-orange-700/40 bg-orange-900/30 px-3 py-1 text-xs font-medium text-orange-400">
+          <FiAlertTriangle size={12} />
+          Reported — {answer.reportReason}
         </div>
       )}
 
       <div className="flex gap-4">
-        {/* Upvote column */}
-        <div className="flex flex-col items-center gap-2 flex-shrink-0">
+        <div className="flex flex-col items-center gap-2">
           <button
             onClick={() => onUpvote(answer._id)}
-            className={`flex flex-col items-center p-2 rounded-lg border
-                        transition-all min-w-[44px] ${
-                          isUpvoted
-                            ? 'bg-lms-primary/30 border-lms-secondary text-lms-secondary'
-                            : 'bg-lms-dark border-lms-primary/30 text-slate-400 hover:border-lms-secondary hover:text-lms-secondary'
-                        }`}
+            className={`flex min-w-[44px] flex-col items-center rounded-2xl border p-2 transition-all ${
+              isUpvoted
+                ? 'border-lms-secondary bg-lms-primary/30 text-lms-secondary'
+                : 'border-white/10 bg-[#1f1830] text-slate-400 hover:border-lms-secondary hover:text-lms-secondary'
+            }`}
           >
             <FiArrowUp size={15} />
-            <span className="text-xs font-bold mt-0.5">
-              {answer.upvotes?.length || 0}
-            </span>
+            <span className="mt-0.5 text-xs font-bold">{answer.upvotes?.length || 0}</span>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Author row */}
-          <div className="flex items-center justify-between mb-3">
+        <div className="min-w-0 flex-1">
+          <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 bg-lms-accent rounded-full flex items-center
-                           justify-center text-white text-xs font-bold flex-shrink-0"
-              >
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-lms-accent text-xs font-bold text-white">
                 {answer.authorName?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div>
-                <p className="text-white font-medium text-sm leading-tight">
-                  {answer.authorName}
-                </p>
-                <p className="text-slate-500 text-xs">
-                  {timeAgo(answer.createdAt)}
-                </p>
+                <p className="text-sm font-medium text-white">{answer.authorName}</p>
+                <p className="text-xs text-slate-500">{timeAgo(answer.createdAt)}</p>
               </div>
             </div>
 
-            {/* Admin action buttons */}
             <div className="flex items-center gap-1">
               <button
                 onClick={() => {
                   setEditBody(answer.body);
                   setShowEdit(!showEdit);
                 }}
-                className="p-1.5 text-slate-400 hover:text-blue-400
-                           hover:bg-blue-900/20 rounded-lg transition-all"
+                className="rounded-lg p-1.5 text-slate-400 transition-all hover:bg-blue-900/20 hover:text-blue-400"
                 title="Edit answer"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
               <button
                 onClick={() => onDelete(answer._id)}
-                className="p-1.5 text-slate-400 hover:text-red-400
-                           hover:bg-red-900/20 rounded-lg transition-all"
+                className="rounded-lg p-1.5 text-slate-400 transition-all hover:bg-red-900/20 hover:text-red-400"
                 title="Delete answer"
               >
                 <FiTrash2 size={13} />
               </button>
               <button
                 onClick={() => onReport(answer._id)}
-                className="p-1.5 text-slate-400 hover:text-orange-400
-                           hover:bg-orange-900/20 rounded-lg transition-all"
+                className="rounded-lg p-1.5 text-slate-400 transition-all hover:bg-orange-900/20 hover:text-orange-400"
                 title="Flag answer"
               >
                 <FiAlertTriangle size={13} />
@@ -504,13 +410,12 @@ const AdminAnswerCard = ({
             </div>
           </div>
 
-          {/* Edit form */}
           {showEdit ? (
             <div className="space-y-2">
               <textarea
                 value={editBody}
                 onChange={(e) => setEditBody(e.target.value)}
-                className="input-field resize-none"
+                className="w-full resize-none rounded-2xl border border-white/10 bg-[#1f1830] px-4 py-3 text-sm text-white outline-none transition-all focus:border-lms-secondary/30"
                 rows={4}
                 autoFocus
               />
@@ -518,26 +423,21 @@ const AdminAnswerCard = ({
                 <button
                   onClick={handleSaveEdit}
                   disabled={saving || !editBody.trim()}
-                  className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1.5"
+                  className="inline-flex items-center gap-1.5 rounded-2xl bg-[linear-gradient(135deg,#6d63ff,#5b7cff)] px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {saving && (
-                    <div className="w-3 h-3 border border-white/30 border-t-white
-                                    rounded-full animate-spin" />
-                  )}
+                  {saving && <div className="h-3 w-3 animate-spin rounded-full border border-white/30 border-t-white" />}
                   Save Changes
                 </button>
                 <button
                   onClick={() => setShowEdit(false)}
-                  className="btn-secondary text-xs px-3 py-1.5"
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-slate-300 transition-all hover:bg-white/[0.05] hover:text-white"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <p className="text-slate-300 text-sm leading-relaxed">
-              {answer.body}
-            </p>
+            <p className="text-sm leading-7 text-slate-300">{answer.body}</p>
           )}
         </div>
       </div>
@@ -545,98 +445,77 @@ const AdminAnswerCard = ({
   );
 };
 
-// ── Question List Card ────────────────────────────────────────────────────────
 const QuestionListCard = ({ question, onSelect, onDelete }) => (
-  <div className="card group hover:border-lms-secondary/50 transition-all cursor-pointer"
-       onClick={() => onSelect(question._id)}>
+  <div
+    className="group cursor-pointer rounded-[28px] border border-white/6 bg-[#2b2340] px-5 py-5 shadow-[0_24px_70px_rgba(9,10,24,0.18)] transition-all duration-200 hover:border-white/14 hover:bg-[#31274b]"
+    onClick={() => onSelect(question._id)}
+  >
     <div className="flex gap-4">
-      {/* Stats column */}
       <div className="flex flex-col items-center gap-2 flex-shrink-0">
-        <div
-          className="flex flex-col items-center p-2 bg-lms-darkest rounded-lg
-                     border border-lms-primary/20 min-w-[52px] text-center"
-        >
-          <FiArrowUp className="text-lms-secondary mx-auto" size={13} />
-          <span className="text-white font-bold text-sm">
-            {question.upvotes?.length || 0}
-          </span>
-          <span className="text-slate-500 text-xs">votes</span>
+        <div className="flex min-w-[52px] flex-col items-center rounded-2xl border border-white/8 bg-[#1f1830] p-2 text-center">
+          <FiArrowUp className="mx-auto text-lms-secondary" size={13} />
+          <span className="text-sm font-bold text-white">{question.upvotes?.length || 0}</span>
+          <span className="text-xs text-slate-500">votes</span>
         </div>
 
         {question.acceptedAnswer && (
-          <div
-            className="flex flex-col items-center p-1.5 bg-green-900/30
-                       rounded-lg border border-green-700/30 min-w-[52px]"
-          >
+          <div className="flex min-w-[52px] flex-col items-center rounded-2xl border border-green-700/30 bg-green-900/30 p-1.5">
             <FiCheck className="text-green-400" size={13} />
-            <span className="text-green-400 text-xs">solved</span>
+            <span className="text-xs text-green-400">solved</span>
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <h3
-          className="text-white font-semibold text-sm mb-1 leading-snug
-                     group-hover:text-lms-secondary transition-colors line-clamp-2"
-        >
+      <div className="min-w-0 flex-1">
+        <h3 className="mb-2 line-clamp-2 text-2xl font-bold leading-snug text-white transition-colors group-hover:text-lms-secondary">
           {question.title}
         </h3>
-        <p className="text-slate-400 text-xs mb-2 line-clamp-1">
-          {question.body}
-        </p>
+        <p className="mb-3 line-clamp-1 text-sm text-slate-400">{question.body}</p>
 
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          <span
-            className="px-2 py-0.5 bg-lms-accent/30 text-lms-muted
-                       border border-lms-accent/30 rounded-full text-xs"
-          >
+        <div className="mb-3 flex flex-wrap gap-2">
+          <span className="rounded-full border border-white/6 bg-white/[0.04] px-3 py-1 text-xs text-slate-400">
             {question.subject}
           </span>
           {question.tags?.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1 px-2 py-0.5
-                         bg-lms-primary/20 text-slate-400 rounded-full text-xs"
+              className="flex items-center gap-1 rounded-full border border-white/6 bg-white/[0.04] px-3 py-1 text-xs text-slate-400"
             >
-              <FiTag size={9} /> {tag}
+              <FiTag size={9} />
+              {tag}
             </span>
           ))}
           {question.isFlagged && (
-            <span
-              className="flex items-center gap-1 px-2 py-0.5 bg-orange-900/30
-                         text-orange-400 border border-orange-700/30 rounded-full text-xs"
-            >
-              <FiAlertTriangle size={9} /> Flagged
+            <span className="flex items-center gap-1 rounded-full border border-orange-700/30 bg-orange-900/30 px-3 py-1 text-xs text-orange-400">
+              <FiAlertTriangle size={9} />
+              Flagged
             </span>
           )}
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
             <span className="flex items-center gap-1">
               <FiClock size={10} /> {timeAgo(question.createdAt)}
             </span>
+            <span>{question.answersCount || question.answers?.length || 0}</span>
             <span className="flex items-center gap-1">
               <FiEye size={10} /> {question.viewCount || 0}
             </span>
-            <span className="text-lms-muted">by {question.authorName}</span>
+            <span>by {question.authorName}</span>
           </div>
 
-          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => onDelete(question._id)}
-              className="p-1.5 text-slate-500 hover:text-red-400
-                         hover:bg-red-900/20 rounded-lg transition-all"
+              className="rounded-xl p-2 text-slate-500 transition-all hover:bg-red-900/20 hover:text-red-300"
               title="Delete question"
             >
               <FiTrash2 size={13} />
             </button>
             <button
               onClick={() => onSelect(question._id)}
-              className="flex items-center gap-1 px-2 py-1 text-xs
-                         text-lms-secondary hover:text-white
-                         hover:bg-lms-secondary/20 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-medium text-lms-secondary transition-colors hover:bg-lms-secondary/20 hover:text-white"
             >
               View &amp; Reply <FiChevronRight size={12} />
             </button>
@@ -647,17 +526,16 @@ const QuestionListCard = ({ question, onSelect, onDelete }) => (
   </div>
 );
 
-// ── Main AdminQAForum Component ───────────────────────────────────────────────
 const AdminQAForum = () => {
-  const [view, setView]               = useState('list');   // 'list' | 'detail'
-  const [selectedId, setSelectedId]   = useState(null);
-  const [questions, setQuestions]     = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [search, setSearch]           = useState('');
+  const [view, setView] = useState('list');
+  const [selectedId, setSelectedId] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [filterFlagged, setFilterFlagged] = useState(false);
-  const [page, setPage]               = useState(1);
-  const [totalPages, setTotalPages]   = useState(1);
-  const [total, setTotal]             = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [deleteModal, setDeleteModal] = useState({ open: false, id: '' });
 
   const fetchQuestions = useCallback(async () => {
@@ -702,101 +580,81 @@ const AdminQAForum = () => {
     fetchQuestions();
   };
 
-  // ── Detail view ──────────────────────────────────────────────────────────────
   if (view === 'detail' && selectedId) {
-    return (
-      <AdminQuestionDetail
-        questionId={selectedId}
-        onBack={handleBack}
-      />
-    );
+    return <AdminQuestionDetail questionId={selectedId} onBack={handleBack} />;
   }
 
-  // ── List view ────────────────────────────────────────────────────────────────
   return (
-    <div>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Q&amp;A Forum Moderation</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
-            {total} question{total !== 1 ? 's' : ''} total
-            — click any question to view details and reply
+          <h1 className="text-4xl font-black tracking-tight text-white">Q&amp;A Forum Moderation</h1>
+          <p className="mt-2 text-base text-slate-400">
+            {total} questions total — click any question to view details and reply
           </p>
         </div>
 
-        {/* Flagged filter toggle */}
         <button
-          onClick={() => { setFilterFlagged(!filterFlagged); setPage(1); }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm
-                      font-medium transition-all ${
-                        filterFlagged
-                          ? 'bg-orange-900/40 border-orange-700/60 text-orange-400'
-                          : 'bg-lms-dark border-lms-primary/30 text-slate-400 hover:text-white'
-                      }`}
+          onClick={() => {
+            setFilterFlagged(!filterFlagged);
+            setPage(1);
+          }}
+          className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-medium transition-all ${
+            filterFlagged
+              ? 'border-orange-700/40 bg-orange-900/30 text-orange-300'
+              : 'border-white/10 bg-white/[0.03] text-slate-400 hover:text-white'
+          }`}
         >
           <FiAlertTriangle size={14} />
           {filterFlagged ? 'Showing Flagged' : 'Show Flagged Only'}
         </button>
       </div>
 
-      {/* Search bar */}
       <div className="relative mb-6">
-        <FiSearch
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-          size={14}
-        />
+        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
         <input
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="input-field pl-9"
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          className="w-full rounded-2xl border border-white/10 bg-transparent py-3 pl-10 pr-10 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-lms-secondary/30"
           placeholder="Search questions by title, body or tags..."
         />
         {search && (
           <button
             onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2
-                       text-slate-500 hover:text-white transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-white"
           >
             <FiX size={14} />
           </button>
         )}
       </div>
 
-      {/* Info bar */}
-      <div
-        className="flex items-center gap-2 p-3 mb-5 bg-lms-secondary/10
-                   border border-lms-secondary/20 rounded-lg"
-      >
-        <FiMessageSquare className="text-lms-secondary flex-shrink-0" size={15} />
-        <p className="text-slate-300 text-xs">
-          Click <strong className="text-lms-secondary">View &amp; Reply</strong> on any
-          question to open a detailed view where you can post answers, edit or delete
-          student answers, and moderate content.
+      <div className="mb-5 flex items-center gap-2 rounded-2xl border border-white/8 bg-[#2b2340] p-4">
+        <FiMessageSquare className="flex-shrink-0 text-lms-secondary" size={15} />
+        <p className="text-sm text-slate-300">
+          Click <strong className="text-lms-secondary">View &amp; Reply</strong> on any question to open a detailed view where you can post answers, edit or delete student answers, and moderate content.
         </p>
       </div>
 
-      {/* Questions list */}
       {loading ? (
         <LoadingSpinner />
       ) : questions.length === 0 ? (
-        <div className="card text-center py-16">
-          <FiMessageSquare
-            className="mx-auto text-slate-600 mb-3"
-            size={36}
-          />
-          <p className="text-white font-medium">No questions found</p>
-          <p className="text-slate-400 text-sm mt-1">
+        <div className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-16 text-center shadow-[0_24px_70px_rgba(9,10,24,0.18)]">
+          <FiMessageSquare className="mx-auto mb-3 text-slate-600" size={36} />
+          <p className="text-lg font-semibold text-white">No questions found</p>
+          <p className="mt-2 text-sm text-slate-400">
             {search
               ? 'Try different search terms'
               : filterFlagged
-              ? 'No flagged questions'
-              : 'No questions have been posted yet'}
+                ? 'No flagged questions'
+                : 'No questions have been posted yet'}
           </p>
         </div>
       ) : (
         <>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {questions.map((q) => (
               <QuestionListCard
                 key={q._id}
@@ -806,15 +664,10 @@ const AdminQAForum = () => {
               />
             ))}
           </div>
-          <Pagination
-            page={page}
-            pages={totalPages}
-            onPageChange={setPage}
-          />
+          <Pagination page={page} pages={totalPages} onPageChange={setPage} />
         </>
       )}
 
-      {/* Delete confirm modal */}
       <ConfirmModal
         isOpen={deleteModal.open}
         title="Delete Question"

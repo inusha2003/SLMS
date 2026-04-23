@@ -15,7 +15,6 @@ import profileRoutes from './routes/profileRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
-import commentRoutes from './routes/commentRoutes.js';
 import qaRoutes from './routes/qaRoutes.js';
 import moderationRoutes from './routes/moderationRoutes.js';
 
@@ -99,7 +98,6 @@ app.use('/api/mcq-bank', mcqBankRoutes);
 
 // Member 2 - Notes & Engagement Routes
 app.use('/api/notes', noteRoutes);
-app.use('/api/comments', commentRoutes);
 app.use('/api/qa', qaRoutes);
 app.use('/api/moderation', moderationRoutes);
 

@@ -1,11 +1,41 @@
 import { useState, useEffect, useCallback } from 'react';
 import { moderationApi } from '../../api/moderationApi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { FiShield, FiTrash2, FiCheck, FiX, FiAlertTriangle, FiBookOpen, FiFileText } from 'react-icons/fi';
+import {
+  FiShield,
+  FiTrash2,
+  FiCheck,
+  FiX,
+  FiAlertTriangle,
+  FiBookOpen,
+  FiFileText,
+} from 'react-icons/fi';
 import { timeAgo, formatDateTime } from '../../utils/formatDate';
 import toast from 'react-hot-toast';
 
 const tabs = ['reports', 'flagged', 'logs'];
+
+const tabMeta = [
+  { key: 'reports', label: 'Reports', icon: FiAlertTriangle },
+  { key: 'flagged', label: 'Flagged Notes', icon: FiBookOpen },
+  { key: 'logs', label: 'Audit Logs', icon: FiFileText },
+];
+
+const actionColors = {
+  approve_note: 'text-green-400',
+  reject_note: 'text-red-400',
+  delete_comment: 'text-red-400',
+  delete_note: 'text-red-400',
+  delete_question: 'text-red-400',
+  delete_answer: 'text-red-400',
+  warn_user: 'text-orange-400',
+  suspend_user: 'text-red-500',
+  dismiss_report: 'text-slate-400',
+  flag_content: 'text-orange-400',
+};
+
+const actionButtonClass =
+  'inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-medium transition-all duration-200';
 
 const ModerationPanel = () => {
   const [activeTab, setActiveTab] = useState('reports');
@@ -34,11 +64,16 @@ const ModerationPanel = () => {
     }
   }, [activeTab]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleDismiss = async (reportId) => {
     try {
-      await moderationApi.reviewReport(reportId, { action: 'dismiss', reason: 'Dismissed by admin' });
+      await moderationApi.reviewReport(reportId, {
+        action: 'dismiss',
+        reason: 'Dismissed by admin',
+      });
       toast.success('Report dismissed');
       fetchData();
     } catch {
@@ -48,7 +83,11 @@ const ModerationPanel = () => {
 
   const handleDeleteContent = async (contentType, contentId) => {
     try {
-      await moderationApi.deleteContent({ contentType, contentId, reason: 'Removed by admin' });
+      await moderationApi.deleteContent({
+        contentType,
+        contentId,
+        reason: 'Removed by admin',
+      });
       toast.success('Content removed');
       fetchData();
     } catch {
@@ -56,44 +95,29 @@ const ModerationPanel = () => {
     }
   };
 
-  const actionColors = {
-    approve_note: 'text-green-400',
-    reject_note: 'text-red-400',
-    delete_comment: 'text-red-400',
-    delete_note: 'text-red-400',
-    delete_question: 'text-red-400',
-    delete_answer: 'text-red-400',
-    warn_user: 'text-orange-400',
-    suspend_user: 'text-red-500',
-    dismiss_report: 'text-slate-400',
-    flag_content: 'text-orange-400',
-  };
-
   return (
-    <div>
-      <div className="flex items-center gap-3 mb-6">
-        <FiShield className="text-lms-secondary" size={24} />
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8 flex items-start gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#6d63ff,#5b7cff)] text-white shadow-[0_14px_30px_rgba(93,99,255,0.24)]">
+          <FiShield size={22} />
+        </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Moderation Panel</h1>
-          <p className="text-slate-400 text-sm">Review reports, flags, and audit logs</p>
+          <h1 className="text-4xl font-black tracking-tight text-white">Moderation Panel</h1>
+          <p className="mt-2 text-base text-slate-400">Review reports, flags, and audit logs</p>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 mb-6 p-1 bg-lms-dark rounded-lg border border-lms-primary/20 w-fit">
-        {[
-          { key: 'reports', label: 'Reports', icon: FiAlertTriangle },
-          { key: 'flagged', label: 'Flagged Notes', icon: FiBookOpen },
-          { key: 'logs', label: 'Audit Logs', icon: FiFileText },
-        ].map(({ key, label, icon: Icon }) => (
+      <div className="mb-6 inline-flex flex-wrap gap-1 rounded-[22px] border border-white/6 bg-[#2b2340] p-1.5">
+        {tabMeta.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            className={[
+              'inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all duration-200',
               activeTab === key
-                ? 'bg-lms-secondary text-white shadow'
-                : 'text-slate-400 hover:text-white'
-            }`}
+                ? 'bg-[linear-gradient(135deg,#6d63ff,#5b7cff)] text-white shadow-[0_14px_26px_rgba(93,99,255,0.2)]'
+                : 'text-slate-400 hover:bg-white/[0.04] hover:text-white',
+            ].join(' ')}
           >
             <Icon size={14} />
             {label}
@@ -105,47 +129,57 @@ const ModerationPanel = () => {
         <LoadingSpinner />
       ) : (
         <>
-          {/* Reports Tab */}
           {activeTab === 'reports' && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {reports.length === 0 ? (
-                <div className="card text-center py-12">
-                  <FiCheck className="mx-auto text-green-400 mb-2" size={32} />
-                  <p className="text-white">No pending reports</p>
+                <div className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-20 text-center shadow-[0_24px_70px_rgba(9,10,24,0.2)]">
+                  <FiCheck className="mx-auto mb-4 text-green-400" size={42} />
+                  <p className="text-lg font-semibold text-white">No pending reports</p>
                 </div>
               ) : (
                 reports.map((report) => (
-                  <div key={report._id} className="card border-orange-700/20">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FiAlertTriangle className="text-orange-400" size={16} />
-                          <span className="text-white font-medium text-sm capitalize">
-                            {report.contentType} Reported
-                          </span>
-                          <span className="px-2 py-0.5 bg-orange-900/30 text-orange-400 border border-orange-700/30 rounded-full text-xs">
-                            {report.status}
-                          </span>
+                  <div
+                    key={report._id}
+                    className="rounded-[28px] border border-orange-500/12 bg-[#2b2340] px-6 py-5 shadow-[0_24px_70px_rgba(9,10,24,0.18)]"
+                  >
+                    <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-3 flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/12 text-orange-400">
+                            <FiAlertTriangle size={16} />
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="text-2xl font-bold text-white capitalize">
+                              {report.contentType} Reported
+                            </span>
+                            <span className="rounded-full border border-orange-500/18 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-300">
+                              {report.status}
+                            </span>
+                          </div>
                         </div>
-                        <p className="text-slate-400 text-sm mb-1">
-                          <strong className="text-slate-300">Reason:</strong> {report.reason}
+
+                        <p className="mb-2 text-lg text-slate-300">
+                          <strong className="font-semibold text-white">Reason:</strong> {report.reason}
                         </p>
-                        <p className="text-slate-500 text-xs">
+                        <p className="text-sm text-slate-500">
                           Reported by {report.reporterName} • {timeAgo(report.createdAt)}
                         </p>
                       </div>
-                      <div className="flex gap-2">
+
+                      <div className="flex w-full flex-col gap-2 xl:w-auto xl:min-w-[160px]">
                         <button
                           onClick={() => handleDeleteContent(report.contentType, report.contentId)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-red-900/40 text-red-400 border border-red-700/30 rounded-lg text-xs hover:bg-red-900/60 transition-colors"
+                          className={`${actionButtonClass} border border-red-500/18 bg-red-500/10 text-red-300 hover:bg-red-500/18`}
                         >
-                          <FiTrash2 size={12} /> Remove
+                          <FiTrash2 size={14} />
+                          Remove
                         </button>
                         <button
                           onClick={() => handleDismiss(report._id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-lms-primary/30 text-slate-300 border border-lms-primary/30 rounded-lg text-xs hover:bg-lms-primary/50 transition-colors"
+                          className={`${actionButtonClass} border border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.07]`}
                         >
-                          <FiX size={12} /> Dismiss
+                          <FiX size={14} />
+                          Dismiss
                         </button>
                       </div>
                     </div>
@@ -155,29 +189,35 @@ const ModerationPanel = () => {
             </div>
           )}
 
-          {/* Flagged Notes */}
           {activeTab === 'flagged' && (
-            <div className="space-y-3">
+            <div className="space-y-5">
               {flaggedNotes.length === 0 ? (
-                <div className="card text-center py-12">
-                  <p className="text-slate-400">No flagged notes</p>
+                <div className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-20 text-center shadow-[0_24px_70px_rgba(9,10,24,0.2)]">
+                  <p className="text-lg font-semibold text-white">No flagged notes</p>
                 </div>
               ) : (
                 flaggedNotes.map((note) => (
-                  <div key={note._id} className="card">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-white font-medium">{note.title}</p>
-                        <p className="text-slate-400 text-xs mt-1">{note.subject} • {note.moduleCode}</p>
+                  <div
+                    key={note._id}
+                    className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-5 shadow-[0_24px_70px_rgba(9,10,24,0.18)]"
+                  >
+                    <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-2xl font-bold text-white">{note.title}</h3>
+                        <p className="mt-2 text-base text-slate-400">
+                          {note.subject} • {note.moduleCode}
+                        </p>
                         {note.flagReason && (
-                          <p className="text-orange-400 text-xs mt-1">Flag: {note.flagReason}</p>
+                          <p className="mt-3 text-sm text-orange-300">Flag: {note.flagReason}</p>
                         )}
                       </div>
+
                       <button
                         onClick={() => handleDeleteContent('note', note._id)}
-                        className="btn-danger flex items-center gap-1 text-xs"
+                        className={`${actionButtonClass} border border-red-500/18 bg-red-500/10 text-red-300 hover:bg-red-500/18`}
                       >
-                        <FiTrash2 size={12} /> Remove
+                        <FiTrash2 size={14} />
+                        Remove
                       </button>
                     </div>
                   </div>
@@ -186,38 +226,48 @@ const ModerationPanel = () => {
             </div>
           )}
 
-          {/* Audit Logs */}
           {activeTab === 'logs' && (
-            <div className="card overflow-hidden">
+            <div className="overflow-hidden rounded-[28px] border border-white/6 bg-[#2b2340] shadow-[0_24px_70px_rgba(9,10,24,0.18)]">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-lms-primary/20">
-                      <th className="text-left text-slate-400 text-xs font-medium py-3 px-3">Action</th>
-                      <th className="text-left text-slate-400 text-xs font-medium py-3 px-3">Admin</th>
-                      <th className="text-left text-slate-400 text-xs font-medium py-3 px-3">Target</th>
-                      <th className="text-left text-slate-400 text-xs font-medium py-3 px-3">Details</th>
-                      <th className="text-left text-slate-400 text-xs font-medium py-3 px-3">Time</th>
+                    <tr className="border-b border-white/6">
+                      <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Action
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Admin
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Target
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Details
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Time
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {logs.map((log) => (
-                      <tr key={log._id} className="border-b border-lms-primary/10 hover:bg-lms-darkest/50">
-                        <td className={`py-3 px-3 font-medium text-xs ${actionColors[log.action] || 'text-slate-300'}`}>
+                      <tr key={log._id} className="border-b border-white/6 last:border-b-0 hover:bg-white/[0.02]">
+                        <td className={`px-4 py-4 text-sm font-medium capitalize ${actionColors[log.action] || 'text-slate-300'}`}>
                           {log.action?.replace(/_/g, ' ')}
                         </td>
-                        <td className="py-3 px-3 text-slate-300 text-xs">{log.adminName || 'Admin'}</td>
-                        <td className="py-3 px-3 text-slate-400 text-xs capitalize">{log.targetType || '-'}</td>
-                        <td className="py-3 px-3 text-slate-400 text-xs max-w-xs truncate">{log.details || log.reason || '-'}</td>
-                        <td className="py-3 px-3 text-slate-500 text-xs">{formatDateTime(log.createdAt)}</td>
+                        <td className="px-4 py-4 text-sm text-slate-300">{log.adminName || 'Admin'}</td>
+                        <td className="px-4 py-4 text-sm capitalize text-slate-400">{log.targetType || '-'}</td>
+                        <td className="max-w-xs truncate px-4 py-4 text-sm text-slate-400">
+                          {log.details || log.reason || '-'}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-slate-500">{formatDateTime(log.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+
                 {logs.length === 0 && (
-                  <div className="text-center py-10">
-                    <p className="text-slate-400">No moderation logs</p>
-                  </div>
+                  <div className="px-6 py-16 text-center text-sm text-slate-400">No moderation logs</div>
                 )}
               </div>
             </div>
