@@ -30,7 +30,9 @@ const MyNotes = () => {
     }
   }, [statusFilter]);
 
-  useEffect(() => { fetchNotes(); }, [fetchNotes]);
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
   const handleUpdate = async (formData) => {
     try {
@@ -58,20 +60,22 @@ const MyNotes = () => {
   };
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8">
+        <h1 className="flex items-center gap-3 text-4xl font-black tracking-tight text-white">
           <FiBookOpen className="text-lms-secondary" />
           My Notes
         </h1>
-        <p className="text-slate-400 text-sm">Manage your uploaded notes</p>
+        <p className="mt-2 text-base text-slate-400">Manage your uploaded notes</p>
       </div>
 
       {editNote && (
-        <div className="card mb-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-6 rounded-[30px] border border-white/6 bg-[#2a2238] p-6 shadow-[0_24px_70px_rgba(9,10,24,0.28)]">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-white font-semibold">Edit & Resubmit Note</h2>
-            <button onClick={() => setEditNote(null)} className="text-slate-400 hover:text-white text-sm">Cancel</button>
+            <button onClick={() => setEditNote(null)} className="text-sm text-slate-400 hover:text-white">
+              Cancel
+            </button>
           </div>
           <NoteForm
             onSubmit={handleUpdate}
@@ -82,16 +86,15 @@ const MyNotes = () => {
         </div>
       )}
 
-      {/* Status Tabs */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="mb-7 flex flex-wrap gap-2">
         {statusTabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setStatusFilter(tab)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${
+            className={`rounded-2xl px-4 py-2 text-sm font-medium capitalize transition-all ${
               statusFilter === tab
-                ? 'bg-lms-secondary text-white'
-                : 'bg-lms-dark border border-lms-primary/30 text-slate-400 hover:text-white'
+                ? 'bg-[linear-gradient(135deg,#6d63ff,#5b7cff)] text-white shadow-[0_12px_24px_rgba(93,99,255,0.2)]'
+                : 'border border-white/10 bg-white/[0.03] text-slate-400 hover:text-white'
             }`}
           >
             {tab}
@@ -102,20 +105,27 @@ const MyNotes = () => {
       {loading ? (
         <LoadingSpinner />
       ) : notes.length === 0 ? (
-        <div className="card text-center py-16">
-          <FiBookOpen className="mx-auto text-slate-600 mb-3" size={36} />
-          <p className="text-white font-medium">No notes found</p>
-          <p className="text-slate-400 text-sm mt-1">
+        <div className="rounded-[28px] border border-white/6 bg-[linear-gradient(180deg,rgba(11,17,32,0.96),rgba(11,17,32,0.86))] px-6 py-20 text-center shadow-[0_24px_70px_rgba(2,8,23,0.28)]">
+          <FiBookOpen className="mx-auto mb-3 text-slate-600" size={36} />
+          <p className="text-lg font-semibold text-white">No notes found</p>
+          <p className="mt-2 text-sm text-slate-400">
             {statusFilter !== 'all' ? `No ${statusFilter} notes` : 'Upload your first note!'}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {notes.map((note) => (
             <NoteCard
               key={note._id}
               note={note}
-              onEdit={note.status !== 'approved' ? (n) => { setEditNote(n); window.scrollTo(0, 0); } : undefined}
+              onEdit={
+                note.status !== 'approved'
+                  ? (n) => {
+                      setEditNote(n);
+                      window.scrollTo(0, 0);
+                    }
+                  : undefined
+              }
               onDelete={(n) => setDeleteTarget(n)}
             />
           ))}

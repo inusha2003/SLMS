@@ -14,6 +14,9 @@ const schema = yup.object({
   visibility: yup.string().oneOf(['public', 'private']).required(),
 });
 
+const inputClassName =
+  'w-full rounded-2xl border border-violet-400/20 bg-[#1d1828] px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-violet-400/45 focus:ring-2 focus:ring-violet-500/10';
+
 const NoteForm = ({ onSubmit, defaultValues = {}, isLoading, submitLabel = 'Submit' }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -49,28 +52,28 @@ const NoteForm = ({ onSubmit, defaultValues = {}, isLoading, submitLabel = 'Subm
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
-          <label className="form-label">Title *</label>
-          <input {...register('title')} className="input-field" placeholder="Note title" />
+          <label className="mb-2 block text-sm font-semibold text-slate-200">Title *</label>
+          <input {...register('title')} className={inputClassName} placeholder="Note title" />
           {errors.title && <p className="error-text">{errors.title.message}</p>}
         </div>
 
         <div>
-          <label className="form-label">Subject *</label>
-          <input {...register('subject')} className="input-field" placeholder="e.g. Mathematics" />
+          <label className="mb-2 block text-sm font-semibold text-slate-200">Subject *</label>
+          <input {...register('subject')} className={inputClassName} placeholder="e.g. Mathematics" />
           {errors.subject && <p className="error-text">{errors.subject.message}</p>}
         </div>
 
         <div>
-          <label className="form-label">Module Code *</label>
-          <input {...register('moduleCode')} className="input-field" placeholder="e.g. CS101" />
+          <label className="mb-2 block text-sm font-semibold text-slate-200">Module Code *</label>
+          <input {...register('moduleCode')} className={inputClassName} placeholder="e.g. CS101" />
           {errors.moduleCode && <p className="error-text">{errors.moduleCode.message}</p>}
         </div>
 
         <div>
-          <label className="form-label">Visibility</label>
-          <select {...register('visibility')} className="input-field">
+          <label className="mb-2 block text-sm font-semibold text-slate-200">Visibility</label>
+          <select {...register('visibility')} className={inputClassName}>
             <option value="public">Public</option>
             <option value="private">Private</option>
           </select>
@@ -78,24 +81,24 @@ const NoteForm = ({ onSubmit, defaultValues = {}, isLoading, submitLabel = 'Subm
       </div>
 
       <div>
-        <label className="form-label">Description</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-200">Description</label>
         <textarea
           {...register('description')}
-          className="input-field resize-none"
-          rows={3}
+          className={`${inputClassName} resize-none`}
+          rows={4}
           placeholder="Brief description of the note content..."
         />
         {errors.description && <p className="error-text">{errors.description.message}</p>}
       </div>
 
       <div>
-        <label className="form-label">Tags (comma separated)</label>
-        <input {...register('tags')} className="input-field" placeholder="e.g. algebra, calculus, exam" />
+        <label className="mb-2 block text-sm font-semibold text-slate-200">Tags (comma separated)</label>
+        <input {...register('tags')} className={inputClassName} placeholder="e.g. algebra, calculus, exam" />
       </div>
 
       <div>
-        <label className="form-label">File Upload (PDF, DOCX, PPT, Images)</label>
-        <div className="border-2 border-dashed border-lms-primary/50 rounded-lg p-6 text-center hover:border-lms-secondary/70 transition-colors">
+        <label className="mb-2 block text-sm font-semibold text-slate-200">File Upload (PDF, DOCX, PPT, Images)</label>
+        <div className="rounded-[24px] border-2 border-dashed border-violet-400/18 bg-[#1a1524] p-8 text-center transition-colors hover:border-violet-400/35">
           <input
             type="file"
             id="file-upload"
@@ -104,27 +107,27 @@ const NoteForm = ({ onSubmit, defaultValues = {}, isLoading, submitLabel = 'Subm
             className="hidden"
           />
           <label htmlFor="file-upload" className="cursor-pointer">
-            <FiUpload className="mx-auto mb-2 text-lms-secondary" size={28} />
-            <p className="text-slate-300 text-sm">
+            <FiUpload className="mx-auto mb-3 text-violet-400" size={30} />
+            <p className="text-sm text-slate-300">
               {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
             </p>
-            <p className="text-slate-500 text-xs mt-1">PDF, DOCX, PPT, PNG, JPG (max 20MB)</p>
+            <p className="mt-1 text-xs text-slate-500">PDF, DOCX, PPT, PNG, JPG (max 20MB)</p>
           </label>
         </div>
 
         {selectedFile && (
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-3 flex items-center gap-3">
             <button
               type="button"
               onClick={() => setPreviewOpen(true)}
-              className="flex items-center gap-1 text-xs text-lms-secondary hover:text-white transition-colors"
+              className="flex items-center gap-1 text-sm text-violet-300 transition-colors hover:text-white"
             >
               <FiEye size={14} /> Preview
             </button>
             <button
               type="button"
               onClick={() => setSelectedFile(null)}
-              className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors"
+              className="flex items-center gap-1 text-sm text-red-400 transition-colors hover:text-red-300"
             >
               <FiX size={14} /> Remove
             </button>
@@ -142,17 +145,24 @@ const NoteForm = ({ onSubmit, defaultValues = {}, isLoading, submitLabel = 'Subm
         />
       )}
 
-      <div className="flex gap-3">
-        <button type="submit" disabled={isLoading} className="btn-primary flex items-center gap-2">
+      <div className="flex flex-wrap gap-3 pt-2">
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#6d63ff,#5b7cff)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(93,99,255,0.22)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+        >
           {isLoading ? (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
           ) : null}
           {isLoading ? 'Submitting...' : submitLabel}
         </button>
         <button
           type="button"
-          onClick={() => { reset(); setSelectedFile(null); }}
-          className="btn-secondary"
+          onClick={() => {
+            reset();
+            setSelectedFile(null);
+          }}
+          className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/[0.05] hover:text-white"
         >
           Reset
         </button>

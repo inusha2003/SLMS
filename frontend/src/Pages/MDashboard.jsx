@@ -44,7 +44,7 @@ const Dashboard = () => {
   const initials = (user?.firstName?.[0] || '') + (user?.lastName?.[0] || '');
 
   const quickActions = [
-    { title: 'Study Notes', desc: 'Browse & Upload Notes', icon: FileText, color: 'from-blue-500 to-blue-600', link: '/notes' },
+    { title: 'Study Notes', desc: 'Browse & Upload Notes', icon: FileText, color: 'from-blue-500 to-blue-600', link: '/student/browse-notes' },
     { title: 'AI Assistant', desc: 'PDF Summaries & MCQs', icon: Cpu, color: 'from-violet-500 to-purple-600', link: '/ai-tools' },
     { title: 'My Performance', desc: 'Analytics & Charts', icon: TrendingUp, color: 'from-emerald-500 to-teal-600', link: '/performance' },
   ];
