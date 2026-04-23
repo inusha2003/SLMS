@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react';
 import { moderationApi } from '../../api/moderationApi';
-import { FiBookOpen, FiClock, FiCheckCircle, FiXCircle, FiAlertTriangle, FiHelpCircle } from 'react-icons/fi';
+import {
+  FiBookOpen,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiAlertTriangle,
+  FiHelpCircle,
+} from 'react-icons/fi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
-//gygyh
-const StatCard = ({ icon: Icon, label, value, color }) => (
-  <div className="card flex items-center gap-4">
-    <div className={`p-3 rounded-lg ${color}`}>
-      <Icon className="text-white" size={22} />
-    </div>
-    <div>
-      <p className="text-slate-400 text-xs font-medium">{label}</p>
-      <p className="text-white font-bold text-2xl">{value ?? '-'}</p>
+const StatCard = ({ icon: Icon, label, value, colorClass }) => (
+  <div className="rounded-[26px] border border-white/6 bg-[#2b2340] px-5 py-6 shadow-[0_20px_60px_rgba(9,10,24,0.18)]">
+    <div className="flex items-center gap-4">
+      <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${colorClass}`}>
+        <Icon className="text-white" size={24} />
+      </div>
+      <div>
+        <p className="text-sm text-slate-400">{label}</p>
+        <p className="mt-1 text-4xl font-black tracking-tight text-white">{value ?? '-'}</p>
+      </div>
     </div>
   </div>
 );
@@ -21,7 +29,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    moderationApi.getStats()
+    moderationApi
+      .getStats()
       .then((res) => setStats(res.data.data))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -30,26 +39,26 @@ const AdminDashboard = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div>
+    <div className="mx-auto max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-        <p className="text-slate-400 text-sm mt-1">Overview of the learning management system</p>
+        <h1 className="text-4xl font-black tracking-tight text-white">Admin Dashboard</h1>
+        <p className="mt-2 text-base text-slate-400">Overview of the learning management system</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-        <StatCard icon={FiBookOpen} label="Total Notes" value={stats?.totalNotes} color="bg-lms-primary" />
-        <StatCard icon={FiClock} label="Pending Approval" value={stats?.pendingNotes} color="bg-yellow-700" />
-        <StatCard icon={FiCheckCircle} label="Approved Notes" value={stats?.approvedNotes} color="bg-green-700" />
-        <StatCard icon={FiXCircle} label="Rejected Notes" value={stats?.rejectedNotes} color="bg-red-700" />
-        <StatCard icon={FiHelpCircle} label="Q&A Questions" value={stats?.totalQuestions} color="bg-lms-accent" />
-        <StatCard icon={FiAlertTriangle} label="Pending Reports" value={stats?.pendingReports} color="bg-orange-700" />
+      <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <StatCard icon={FiBookOpen} label="Total Notes" value={stats?.totalNotes} colorClass="bg-[#5756a7]" />
+        <StatCard icon={FiClock} label="Pending Approval" value={stats?.pendingNotes} colorClass="bg-[#bf7a07]" />
+        <StatCard icon={FiCheckCircle} label="Approved Notes" value={stats?.approvedNotes} colorClass="bg-[#10a34a]" />
+        <StatCard icon={FiXCircle} label="Rejected Notes" value={stats?.rejectedNotes} colorClass="bg-[#dc0d19]" />
+        <StatCard icon={FiHelpCircle} label="Q&A Questions" value={stats?.totalQuestions} colorClass="bg-[#44536d]" />
+        <StatCard icon={FiAlertTriangle} label="Pending Reports" value={stats?.pendingReports} colorClass="bg-[#e15811]" />
       </div>
 
-      <div className="card">
-        <h2 className="text-white font-semibold mb-3">Quick Actions</h2>
-        <p className="text-slate-400 text-sm">
-          Use the sidebar to navigate to Manage Notes, review Pending Approvals, moderate Q&A, and manage
-          the Moderation Panel.
+      <div className="rounded-[26px] border border-white/6 bg-[#2b2340] px-6 py-7 shadow-[0_20px_60px_rgba(9,10,24,0.18)]">
+        <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
+        <p className="mt-4 text-base leading-7 text-slate-400">
+          Use the sidebar to navigate to Manage Notes, review Pending Approvals, moderate Q&A,
+          and manage the Moderation Panel.
         </p>
       </div>
     </div>

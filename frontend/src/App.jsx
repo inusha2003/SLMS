@@ -24,6 +24,12 @@ import UploadNote from "./Pages/student/UploadNote.jsx";
 import StudentQAForum from "./Pages/student/StudentQAForum.jsx";
 import NoteDetail from "./Pages/student/NoteDetail.jsx";
 import StudentDashboard from "./Pages/student/StudentDashboard.jsx";
+import AdminDashboard from "./Pages/admin/AdminDashboard.jsx";
+import ManageNotes from "./Pages/admin/ManageNotes.jsx";
+import PendingApprovals from "./Pages/admin/PendingApprovals.jsx";
+import Discussions from "./Pages/admin/Discussions.jsx";
+import AdminQAForum from "./Pages/admin/AdminQAForum.jsx";
+import ModerationPanel from "./Pages/admin/ModerationPanel.jsx";
 
 import { isAdminLoggedIn } from "./lib/session.js";
 
@@ -77,6 +83,16 @@ function StudentPortalRoutes() {
         <Outlet />
       </DashboardLayout>
     </ProtectedRoute>
+  );
+}
+
+function AdminPortalRoutes() {
+  return (
+    <AdminRoute>
+      <DashboardLayout>
+        <Outlet />
+      </DashboardLayout>
+    </AdminRoute>
   );
 }
 
@@ -263,14 +279,16 @@ const App = () => {
             <Route path="goals" element={<StudentGoalsPage />} />
           </Route>
 
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminPanel />
-              </AdminRoute>
-            }
-          />
+          <Route path="/admin" element={<AdminPortalRoutes />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="manage-notes" element={<ManageNotes />} />
+            <Route path="pending" element={<PendingApprovals />} />
+            <Route path="discussions" element={<Discussions />} />
+            <Route path="qa-forum" element={<AdminQAForum />} />
+            <Route path="moderation" element={<ModerationPanel />} />
+            <Route path="users" element={<AdminPanel />} />
+          </Route>
 
           <Route
             path="/admin/create-exam"
