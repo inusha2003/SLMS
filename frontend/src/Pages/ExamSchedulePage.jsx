@@ -132,11 +132,20 @@ export default function ExamSchedulePage() {
   async function handleDeleteExam() {
     if (!deleteTarget || deleteLoading) return;
 
+    const examId = String(deleteTarget._id ?? deleteTarget.id ?? "").trim();
+    if (!/^[a-fA-F0-9]{24}$/.test(examId)) {
+      setFeedback({
+        type: "error",
+        text: "Invalid exam id. Please refresh the page and try again.",
+      });
+      return;
+    }
+
     setDeleteLoading(true);
     setError("");
 
     try {
-      const res = await fetch(apiUrl(`/api/assessment/exams/${deleteTarget._id}`), {
+      const res = await fetch(apiUrl(`/api/assessment/exams/${examId}`), {
         method: "DELETE",
         headers: getAuthHeaders(),
       });

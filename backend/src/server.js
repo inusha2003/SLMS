@@ -18,7 +18,6 @@ import noteRoutes from './routes/noteRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import qaRoutes from './routes/qaRoutes.js';
 import moderationRoutes from './routes/moderationRoutes.js';
-import assessmentPerformanceRoutes from './routes/assessmentPerformanceRoutes.js';
 
 const require = createRequire(import.meta.url);
 const contentRoutes = require('./routes/contentRoutes.jsx');
@@ -94,7 +93,6 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/content', contentRoutes);
-app.use('/api/assessment', assessmentPerformanceRoutes);
 app.use('/api/assessment', assessmentRoutes);
 app.use('/api/flashcards', flashcardRoutes);
 app.use('/api/mcq-bank', mcqBankRoutes);
