@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/MAuthContext';
 import {
   TrendingUp,
-  Calendar,
   GraduationCap,
   Award,
   Settings,
@@ -48,7 +47,6 @@ const Dashboard = () => {
     { title: 'Study Notes', desc: 'Browse & Upload Notes', icon: FileText, color: 'from-blue-500 to-blue-600', link: '/notes' },
     { title: 'AI Assistant', desc: 'PDF Summaries & MCQs', icon: Cpu, color: 'from-violet-500 to-purple-600', link: '/ai-tools' },
     { title: 'My Performance', desc: 'Analytics & Charts', icon: TrendingUp, color: 'from-emerald-500 to-teal-600', link: '/performance' },
-    { title: 'Academic Calendar', desc: 'Events & Deadlines', icon: Calendar, color: 'from-amber-500 to-orange-600', link: '/calendar' },
   ];
 
   // Demo tasks with createdAt
