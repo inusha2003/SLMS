@@ -26,31 +26,35 @@ const UploadNote = () => {
 
   if (success) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-700/40">
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="rounded-[28px] border border-emerald-500/20 bg-[linear-gradient(180deg,rgba(16,44,36,0.92),rgba(11,24,25,0.92))] px-10 py-12 text-center shadow-[0_24px_70px_rgba(3,12,10,0.28)]">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-green-700/40 bg-green-900/30">
             <FiCheckCircle className="text-green-400" size={32} />
           </div>
-          <h2 className="text-white font-bold text-xl mb-2">Note Submitted!</h2>
-          <p className="text-slate-400 text-sm">Your note is pending admin approval. Redirecting...</p>
+          <h2 className="mb-2 text-xl font-bold text-white">Note Submitted!</h2>
+          <p className="text-sm text-slate-400">Your note is pending admin approval. Redirecting...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <FiUpload className="text-lms-secondary" />
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-8">
+        <h1 className="flex items-center gap-3 text-4xl font-black tracking-tight text-white">
+          <FiUpload className="text-violet-400" />
           Upload Note
         </h1>
-        <p className="text-slate-400 text-sm">Share your study materials. All submissions require admin approval.</p>
+        <p className="mt-2 text-base text-slate-400">
+          Share your study materials. All submissions require admin approval.
+        </p>
       </div>
 
-      <div className="card">
-        <div className="flex items-center gap-2 p-3 bg-yellow-900/20 border border-yellow-700/30 rounded-lg mb-6">
-          <span className="text-yellow-400 text-xs">⚠️ Your note will be reviewed by an admin before it becomes visible to others.</span>
+      <div className="rounded-[30px] border border-white/6 bg-[#2a2238] px-6 py-7 shadow-[0_24px_70px_rgba(9,10,24,0.28)] md:px-8">
+        <div className="mb-7 flex items-center gap-2 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-4">
+          <span className="text-sm text-amber-300">
+            Your note will be reviewed by an admin before it becomes visible to others.
+          </span>
         </div>
         <NoteForm onSubmit={handleSubmit} isLoading={loading} submitLabel="Submit for Review" />
       </div>

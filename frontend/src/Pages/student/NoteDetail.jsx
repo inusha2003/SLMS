@@ -32,7 +32,7 @@ const NoteDetail = () => {
     <div className="max-w-4xl mx-auto">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm"
+        className="mb-6 flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-white"
       >
         <FiArrowLeft size={16} />
         Back

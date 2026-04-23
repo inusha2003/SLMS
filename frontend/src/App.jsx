@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useParams } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import { useAuth } from "./context/MAuthContext";
@@ -18,6 +18,12 @@ import ProfileSetup from "./Pages/MProfileSetup";
 import AdminPanel from "./Pages/MAdminPanel";
 import AdminCreateExamPage from "./Pages/AdminCreateExamPage.jsx";
 import Planner from "./Pages/Planner";
+import BrowseNotes from "./Pages/student/BrowseNotes.jsx";
+import MyNotes from "./Pages/student/MyNotes.jsx";
+import UploadNote from "./Pages/student/UploadNote.jsx";
+import StudentQAForum from "./Pages/student/StudentQAForum.jsx";
+import NoteDetail from "./Pages/student/NoteDetail.jsx";
+import StudentDashboard from "./Pages/student/StudentDashboard.jsx";
 
 import { isAdminLoggedIn } from "./lib/session.js";
 
@@ -29,6 +35,7 @@ import StudentGoalsPage from "./studentPerformance/StudentGoalsPage.jsx";
 import StudentStudyPlannerPage from "./studentPerformance/StudentStudyPlannerPage.jsx";
 
 import AiWorkspaceLayout from "./Components/layout/AiWorkspaceLayout.jsx";
+import DashboardLayout from "./Components/layout/DashboardLayout.jsx";
 import AiContentGenerator from "./Components/AiContentGenerator.jsx";
 import AiPerformancePage from "./Pages/PerformancePage.jsx";
 import AiMcqBankPage from "./Pages/McqBankPage.jsx";
@@ -56,6 +63,21 @@ function LegacyExamResultRedirect() {
 function LegacyExamEditRedirect() {
   const { examId } = useParams();
   return <Navigate to={`/ai-tools/exams/${examId}/edit`} replace />;
+}
+
+function LegacyStudentNoteDetailRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/student/notes/${id}`} replace />;
+}
+
+function StudentPortalRoutes() {
+  return (
+    <ProtectedRoute requireProfile>
+      <DashboardLayout>
+        <Outlet />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }
 
 function AccessOnlyCard({ title, description }) {
@@ -271,6 +293,22 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/student" element={<StudentPortalRoutes />}>
+            <Route index element={<Navigate to="/student/dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="browse-notes" element={<BrowseNotes />} />
+            <Route path="my-notes" element={<MyNotes />} />
+            <Route path="upload-note" element={<UploadNote />} />
+            <Route path="qa-forum/*" element={<StudentQAForum />} />
+            <Route path="notes/:id" element={<NoteDetail />} />
+          </Route>
+          <Route
+            path="/notes/:id"
+            element={<LegacyStudentNoteDetailRedirect />}
+          />
+
+          <Route path="/notes" element={<Navigate to="/student/browse-notes" replace />} />
 
           <Route
             path="*"
