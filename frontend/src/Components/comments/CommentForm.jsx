@@ -7,7 +7,13 @@ const schema = yup.object({
   content: yup.string().required('Comment cannot be empty').max(2000, 'Max 2000 characters'),
 });
 
-const CommentForm = ({ onSubmit, isLoading, onCancel, placeholder = 'Write a comment...', submitLabel = 'Post Comment' }) => {
+const CommentForm = ({
+  onSubmit,
+  isLoading,
+  onCancel,
+  placeholder = 'Write a comment...',
+  submitLabel = 'Post Comment',
+}) => {
   const {
     register,
     handleSubmit,
@@ -21,30 +27,45 @@ const CommentForm = ({ onSubmit, isLoading, onCancel, placeholder = 'Write a com
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-2">
-      <textarea
-        {...register('content')}
-        className="input-field resize-none"
-        rows={3}
-        placeholder={placeholder}
-      />
-      {errors.content && <p className="error-text">{errors.content.message}</p>}
-
-      <div className="flex gap-2 justify-end">
-        {onCancel && (
-          <button type="button" onClick={onCancel} className="btn-secondary flex items-center gap-1 text-xs">
-            <FiX size={13} /> Cancel
-          </button>
-        )}
-        <button type="submit" disabled={isLoading} className="btn-primary flex items-center gap-1 text-xs">
-          {isLoading ? (
-            <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <FiSend size={13} />
-          )}
-          {submitLabel}
-        </button>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      <div className="overflow-hidden rounded-[26px] border border-white/10 bg-[#070d18] shadow-[0_20px_45px_rgba(2,6,23,0.28)]">
+        <textarea
+          {...register('content')}
+          rows={4}
+          placeholder={placeholder}
+          className="min-h-[160px] w-full resize-none border-0 bg-transparent px-6 py-5 text-base leading-8 text-slate-100 placeholder:text-slate-500 focus:outline-none"
+        />
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-5 py-4">
+          <div className="text-sm text-slate-500">
+            Share a thoughtful comment, question, or reply.
+          </div>
+          <div className="flex items-center gap-3">
+            {onCancel && (
+              <button
+                type="button"
+                onClick={onCancel}
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:border-white/20 hover:text-white"
+              >
+                <FiX size={14} />
+                Cancel
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex items-center gap-2 rounded-2xl border border-indigo-500/40 bg-indigo-500/10 px-5 py-2.5 text-sm font-semibold text-indigo-100 transition-colors hover:bg-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isLoading ? (
+                <div className="h-4 w-4 rounded-full border border-white/30 border-t-white animate-spin" />
+              ) : (
+                <FiSend size={14} />
+              )}
+              {submitLabel}
+            </button>
+          </div>
+        </div>
       </div>
+      {errors.content && <p className="px-1 text-sm text-rose-400">{errors.content.message}</p>}
     </form>
   );
 };

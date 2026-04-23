@@ -34,6 +34,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const isPortalRoute =
+    location.pathname.startsWith('/student') ||
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/ai-tools') ||
+    location.pathname.startsWith('/performance') ||
+    location.pathname.startsWith('/u');
 
   const handleLogout = () => { logout(); navigate('/'); setOpen(false); };
   const isActive = (path) => location.pathname === path;
@@ -45,9 +51,17 @@ const Navbar = () => {
     }`;
 
   return (
-    <nav className="sticky top-0 z-50 border-b" style={{ backgroundColor: 'var(--bg-nav)', borderColor: 'var(--border-color)', backdropFilter: 'blur(16px)' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav
+      className="sticky top-0 z-50 w-full shrink-0 overflow-x-clip border-b"
+      style={{ backgroundColor: 'var(--bg-nav)', borderColor: 'var(--border-color)', backdropFilter: 'blur(16px)' }}
+    >
+      <div
+        className={[
+          'w-full',
+          isPortalRoute ? 'px-4 sm:px-6 lg:px-8' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+        ].join(' ')}
+      >
+        <div className="flex h-16 min-w-0 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shadow-md shadow-blue-500/20">

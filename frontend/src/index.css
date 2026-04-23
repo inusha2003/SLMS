@@ -367,6 +367,14 @@ body,
   background: #07111f;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  overflow-y: scroll;
+}
+
 button {
   border: 1px solid transparent;
   font-weight: 500;

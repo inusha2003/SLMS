@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { noteApi } from '../../api/noteApi';
 import { commentApi } from '../../api/commentApi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { FiMessageSquare, FiTrash2, FiFlag } from 'react-icons/fi';
+import { FiMessageSquare, FiTrash2 } from 'react-icons/fi';
 import { timeAgo } from '../../utils/formatDate';
 import toast from 'react-hot-toast';
 
@@ -14,7 +14,8 @@ const Discussions = () => {
   const [loadingComments, setLoadingComments] = useState(false);
 
   useEffect(() => {
-    noteApi.getAll({ status: 'approved' })
+    noteApi
+      .getAll({ status: 'approved' })
       .then((res) => setApprovedNotes(res.data.data.notes || []))
       .catch(() => toast.error('Failed to load notes'))
       .finally(() => setLoading(false));
@@ -46,77 +47,89 @@ const Discussions = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="flex gap-6 h-full">
-      {/* Note List */}
-      <div className="w-80 flex-shrink-0 space-y-2">
-        <h1 className="text-xl font-bold text-white mb-4">Discussions</h1>
-        {approvedNotes.map((note) => (
-          <button
-            key={note._id}
-            onClick={() => loadComments(note)}
-            className={`w-full text-left p-3 rounded-lg border transition-all ${
-              selectedNote?._id === note._id
-                ? 'bg-lms-secondary/20 border-lms-secondary text-white'
-                : 'bg-lms-dark border-lms-primary/20 text-slate-300 hover:border-lms-primary/50'
-            }`}
-          >
-            <p className="font-medium text-sm truncate">{note.title}</p>
-            <p className="text-xs text-slate-500 mt-0.5">{note.subject}</p>
-          </button>
-        ))}
-        {approvedNotes.length === 0 && (
-          <p className="text-slate-500 text-sm">No approved notes found</p>
-        )}
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-4xl font-black tracking-tight text-white">Discussions</h1>
       </div>
 
-      {/* Comments Panel */}
-      <div className="flex-1 min-w-0">
-        {!selectedNote ? (
-          <div className="card h-64 flex items-center justify-center">
-            <div className="text-center">
-              <FiMessageSquare className="mx-auto text-slate-600 mb-2" size={32} />
-              <p className="text-slate-500">Select a note to view its discussions</p>
-            </div>
-          </div>
-        ) : (
-          <div className="card">
-            <h2 className="text-white font-bold mb-1">{selectedNote.title}</h2>
-            <p className="text-slate-400 text-xs mb-4">{comments.length} comments</p>
+      <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
+        <aside className="space-y-3">
+          {approvedNotes.map((note) => {
+            const isActive = selectedNote?._id === note._id;
+            return (
+              <button
+                key={note._id}
+                onClick={() => loadComments(note)}
+                className={[
+                  'w-full rounded-[22px] border px-4 py-4 text-left transition-all duration-200',
+                  isActive
+                    ? 'border-white/30 bg-[#30284a] shadow-[0_18px_40px_rgba(9,10,24,0.2)]'
+                    : 'border-white/6 bg-[#2b2340] hover:border-white/14 hover:bg-[#31274b]',
+                ].join(' ')}
+              >
+                <p className="truncate text-xl font-bold text-white">{note.title}</p>
+                <p className="mt-1 text-sm text-slate-500">{note.subject}</p>
+              </button>
+            );
+          })}
 
-            {loadingComments ? (
-              <LoadingSpinner size="sm" />
-            ) : comments.length === 0 ? (
-              <p className="text-slate-500 text-sm">No comments yet</p>
-            ) : (
-              <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                {comments.map((comment) => (
-                  <div key={comment._id} className="p-3 bg-lms-darkest rounded-lg border border-lms-primary/20">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-white text-sm font-medium">{comment.authorName}</p>
-                        <p className="text-slate-500 text-xs">{timeAgo(comment.createdAt)}</p>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {comment.isReported && (
-                          <span className="flex items-center gap-1 text-xs text-orange-400">
-                            <FiFlag size={11} /> Reported
-                          </span>
-                        )}
+          {approvedNotes.length === 0 && (
+            <div className="rounded-[22px] border border-white/6 bg-[#2b2340] px-5 py-10 text-center text-sm text-slate-400">
+              No approved notes found.
+            </div>
+          )}
+        </aside>
+
+        <section className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-6 shadow-[0_24px_70px_rgba(9,10,24,0.18)]">
+          {!selectedNote ? (
+            <div className="flex min-h-[240px] items-center justify-center">
+              <div className="text-center">
+                <FiMessageSquare className="mx-auto mb-3 text-slate-600" size={34} />
+                <p className="text-base text-slate-400">Select a note to view its discussions.</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold text-white">{selectedNote.title}</h2>
+                <p className="mt-2 text-base text-slate-400">{comments.length} comments</p>
+              </div>
+
+              {loadingComments ? (
+                <LoadingSpinner size="sm" />
+              ) : comments.length === 0 ? (
+                <div className="rounded-[22px] border border-white/6 bg-[#241d35] px-5 py-12 text-center text-sm text-slate-400">
+                  No comments yet.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {comments.map((comment) => (
+                    <article
+                      key={comment._id}
+                      className="rounded-[22px] border border-white/6 bg-[#241d35] px-5 py-4"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-lg font-semibold text-white">{comment.authorName}</p>
+                          <p className="mt-1 text-sm text-slate-500">{timeAgo(comment.createdAt)}</p>
+                        </div>
                         <button
                           onClick={() => handleDeleteComment(comment._id)}
-                          className="p-1 text-slate-500 hover:text-red-400 transition-colors"
+                          className="rounded-xl p-2 text-slate-500 transition-colors hover:bg-red-900/20 hover:text-red-300"
+                          title="Delete comment"
                         >
-                          <FiTrash2 size={13} />
+                          <FiTrash2 size={14} />
                         </button>
                       </div>
-                    </div>
-                    <p className="text-slate-300 text-sm mt-2">{comment.content}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+
+                      <p className="mt-4 text-base leading-7 text-slate-200">{comment.content}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </section>
       </div>
     </div>
   );
