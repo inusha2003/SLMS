@@ -5,7 +5,7 @@ import { useAuth } from '../context/MAuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import Spinner from '../Components/MSpinner';
-import { Save, User, GraduationCap, BookOpen, Award, Target, Sparkles } from 'lucide-react';
+import { Save, GraduationCap, BookOpen, Award, Target, Sparkles } from 'lucide-react';
 
 const years = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 const semesters = ['1st Semester', '2nd Semester'];
@@ -181,8 +181,15 @@ const ProfileSetup = () => {
     }
   };
 
+  const fieldClass =
+    'w-full rounded-xl border border-slate-700 bg-[#0b1733] px-4 py-3 text-slate-100 placeholder:text-slate-500 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30';
+  const fieldErrorClass = `${fieldClass} border-red-500/80 focus:border-red-500 focus:ring-red-500/30`;
+
   return (
-    <div style={{ minHeight: 'calc(100vh - 4rem)', position: 'relative', overflow: 'hidden' }}>
+    <div
+      style={{ minHeight: 'calc(100vh - 4rem)', position: 'relative', overflow: 'hidden' }}
+      className="bg-gradient-to-b from-[#081433] to-[#09112a]"
+    >
       {/* Animated Background */}
       <AnimatedBackground />
       <FloatingDecorations />
@@ -191,84 +198,68 @@ const ProfileSetup = () => {
       {/* Form Container */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 4rem)', padding: '3rem 1rem' }}>
         <div style={{ width: '100%', maxWidth: '32rem' }}>
-
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '4.5rem', height: '4.5rem', borderRadius: '1.25rem', marginBottom: '1.25rem', background: 'linear-gradient(135deg, #14b8a6, #0d9488)', boxShadow: '0 8px 24px rgba(20,184,166,0.3)' }} className="animate-scale-pulse">
-              <User style={{ width: '2rem', height: '2rem', color: 'white' }} />
-            </div>
-            <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              {user?.isProfileComplete ? 'Edit Profile' : 'Complete Your Profile'}
-            </h1>
-            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-              {user?.isProfileComplete
-                ? 'Update your academic information below.'
-                : 'Select your academic year and semester to get started.'}
-            </p>
-          </div>
-
           {/* Form Card */}
-          <div className="card" style={{ padding: '2rem', boxShadow: '0 12px 40px rgba(0,0,0,0.08)' }}>
+          <div className="rounded-3xl border border-slate-700/80 bg-[#1b2740]/95 p-6 shadow-2xl shadow-black/30 backdrop-blur-sm">
 
             {/* Step Indicator */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', padding: '0.75rem 1rem', borderRadius: '0.75rem', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}>
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'white' }}>2</span>
+            <div className="mb-6 flex items-center gap-2 rounded-xl border border-slate-700/80 bg-[#202e49] px-4 py-3">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-500">
+                <span className="text-[0.65rem] font-extrabold text-white">2</span>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)' }}>Profile Setup</span>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Step 2 of 3</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-100">Profile Setup</span>
+                  <span className="text-[0.65rem] text-slate-400">Step 2 of 3</span>
                 </div>
-                <div style={{ marginTop: '0.375rem', width: '100%', height: 4, borderRadius: 9999, backgroundColor: 'var(--border-color)' }}>
-                  <div style={{ width: '66%', height: 4, borderRadius: 9999, background: 'linear-gradient(90deg, #3b82f6, #6366f1)', transition: 'width 0.5s' }} />
+                <div className="mt-1.5 h-1 w-full rounded-full bg-slate-700/80">
+                  <div className="h-1 w-2/3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all" />
                 </div>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
 
               {/* Name Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>First Name</label>
+                  <label className="mb-2 block text-sm font-semibold text-slate-200">First Name</label>
                   <input
                     type="text"
-                    className={`input-field ${errors.firstName ? 'input-error' : ''}`}
+                    className={errors.firstName ? fieldErrorClass : fieldClass}
                     placeholder="John"
                     {...register('firstName', {
                       required: 'Required',
                       minLength: { value: 2, message: 'Min 2 chars' },
                     })}
                   />
-                  {errors.firstName && <p style={{ marginTop: 4, fontSize: '0.75rem', color: '#ef4444', fontWeight: 500 }}>{errors.firstName.message}</p>}
+                  {errors.firstName && <p className="mt-1 text-xs font-medium text-red-400">{errors.firstName.message}</p>}
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Last Name</label>
+                  <label className="mb-2 block text-sm font-semibold text-slate-200">Last Name</label>
                   <input
                     type="text"
-                    className={`input-field ${errors.lastName ? 'input-error' : ''}`}
+                    className={errors.lastName ? fieldErrorClass : fieldClass}
                     placeholder="Doe"
                     {...register('lastName', {
                       required: 'Required',
                       minLength: { value: 2, message: 'Min 2 chars' },
                     })}
                   />
-                  {errors.lastName && <p style={{ marginTop: 4, fontSize: '0.75rem', color: '#ef4444', fontWeight: 500 }}>{errors.lastName.message}</p>}
+                  {errors.lastName && <p className="mt-1 text-xs font-medium text-red-400">{errors.lastName.message}</p>}
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Email</label>
-                <input type="email" value={user?.email || ''} disabled className="input-field" />
+                <label className="mb-2 block text-sm font-semibold text-slate-200">Email</label>
+                <input type="email" value={user?.email || ''} disabled className={`${fieldClass} cursor-not-allowed opacity-90`} />
               </div>
 
               {/* Academic Year */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Academic Year</label>
+                <label className="mb-2 block text-sm font-semibold text-slate-200">Academic Year</label>
                 <select
-                  className={`input-field ${errors.academicYear ? 'input-error' : ''}`}
+                  className={errors.academicYear ? fieldErrorClass : fieldClass}
                   {...register('academicYear', { required: 'Please select your academic year' })}
                 >
                   <option value="">Select Year</option>
@@ -276,14 +267,14 @@ const ProfileSetup = () => {
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
-                {errors.academicYear && <p style={{ marginTop: 4, fontSize: '0.75rem', color: '#ef4444', fontWeight: 500 }}>{errors.academicYear.message}</p>}
+                {errors.academicYear && <p className="mt-1 text-xs font-medium text-red-400">{errors.academicYear.message}</p>}
               </div>
 
               {/* Semester */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Semester</label>
+                <label className="mb-2 block text-sm font-semibold text-slate-200">Semester</label>
                 <select
-                  className={`input-field ${errors.semester ? 'input-error' : ''}`}
+                  className={errors.semester ? fieldErrorClass : fieldClass}
                   {...register('semester', { required: 'Please select your semester' })}
                 >
                   <option value="">Select Semester</option>
@@ -291,24 +282,28 @@ const ProfileSetup = () => {
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
-                {errors.semester && <p style={{ marginTop: 4, fontSize: '0.75rem', color: '#ef4444', fontWeight: 500 }}>{errors.semester.message}</p>}
+                {errors.semester && <p className="mt-1 text-xs font-medium text-red-400">{errors.semester.message}</p>}
               </div>
 
               {/* Submit */}
-              <button type="submit" disabled={submitting} className="btn-primary" style={{ width: '100%', padding: '0.875rem', fontSize: '1rem', borderRadius: '0.75rem', marginTop: '0.5rem' }}>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-900/35 transition hover:from-blue-400 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-70"
+              >
                 {submitting ? <Spinner size="sm" /> : (
                   <>
                     <Save style={{ width: 20, height: 20 }} />
-                    {user?.isProfileComplete ? 'Update Profile' : 'Complete Setup'}
+                    {user?.isProfileComplete ? 'Update Profile' : 'Update Profile'}
                   </>
                 )}
               </button>
             </form>
 
             {/* Bottom Info */}
-            <div style={{ marginTop: '1.25rem', padding: '0.75rem 1rem', borderRadius: '0.75rem', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="mt-5 flex items-start gap-2 rounded-xl border border-slate-700/70 bg-[#202e49] px-3 py-3">
               <Sparkles style={{ width: 14, height: 14, color: '#f59e0b', flexShrink: 0 }} />
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              <p className="text-[0.7rem] leading-5 text-slate-400">
                 Your profile helps us personalize courses and recommendations for your academic journey.
               </p>
             </div>

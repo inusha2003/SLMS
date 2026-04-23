@@ -141,18 +141,17 @@ const Home = () => {
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight text-white animate-slide-up-delay opacity-0">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.6rem] font-black leading-[0.98] tracking-[-0.04em] text-white animate-slide-up-delay">
                 Your Academic
                 <br />
                 <span className="text-gradient">Success Starts Here</span>
               </h1>
 
-              <p className="mt-6 text-lg sm:text-xl text-white/60 max-w-lg leading-relaxed animate-slide-up-delay2 opacity-0">
+              <p className="mt-5 max-w-[34rem] text-lg sm:text-[1.15rem] text-white/68 leading-[1.75] animate-slide-up-delay2">
                 The complete platform for managing courses, tracking progress, and achieving your academic goals.
               </p>
 
-              {/* ★ HERO BUTTONS — FIXED ★ */}
-              <div className="mt-10 flex flex-col sm:flex-row items-start gap-4 animate-fade-in-delay2 opacity-0">
+              <div className="mt-8 flex flex-col sm:flex-row items-start gap-4 animate-fade-in-delay2">
                 <Link to="/register" className="btn-hero-primary group w-full sm:w-auto">
                   Get Started Free
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -163,7 +162,7 @@ const Home = () => {
                 </Link>
               </div>
 
-              <div className="mt-10 flex items-center gap-6 text-sm text-white/40 animate-fade-in-delay2 opacity-0">
+              <div className="mt-6 flex items-center gap-6 text-sm text-white/52 animate-fade-in-delay2">
                 <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" />Always Free</span>
                 <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" />No Credit Card</span>
                 <span className="hidden sm:flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" />Instant Access</span>
