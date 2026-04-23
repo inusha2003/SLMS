@@ -182,6 +182,7 @@ export default function StudentPerformanceDashboard() {
 
   const subjectPerformance = payload?.subjectPerformance || [];
   const overall = payload?.overall || null;
+  const summary = payload?.summary || null;
 
   const averageMark =
     overall?.avgPercentage != null
@@ -206,8 +207,9 @@ export default function StudentPerformanceDashboard() {
   const hasRealData =
     (payload?.subjectPerformance?.length || 0) > 0 ||
     (payload?.overall?.attemptCount || 0) > 0;
-  // If there are no records yet, show demo data so the UI isn't empty.
-  const useDemo = !hasRealData;
+  // Keep demo data only for signed-out previews; signed-in students should see
+  // either their real data or the true empty state.
+  const useDemo = guestPreview && !hasRealData;
   const displayPayload = useDemo ? DEMO_PERFORMANCE_PAYLOAD : payload;
   const displaySubjectPerformance = displayPayload?.subjectPerformance || [];
   const displayOverall = displayPayload?.overall || null;
@@ -256,6 +258,17 @@ export default function StudentPerformanceDashboard() {
 
       {!loading && (!error || useDemo) && (
         <>
+          {summary && hasRealData && !useDemo && (
+            <p className="rounded-xl border border-white/[0.06] bg-[#0f1624] px-4 py-3 text-center text-xs text-slate-400">
+              <span className="font-semibold text-slate-300">{summary.totalAttempts ?? 0}</span>{" "}
+              graded attempt
+              {(summary.totalAttempts ?? 0) === 1 ? "" : "s"} across{" "}
+              <span className="font-semibold text-slate-300">{summary.uniqueExamCount ?? 0}</span>{" "}
+              exam
+              {(summary.uniqueExamCount ?? 0) === 1 ? "" : "s"} (timed exams only).
+            </p>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-3">
             <KpiCard
               label="Average mark"

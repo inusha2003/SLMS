@@ -296,7 +296,8 @@ router.get("/exams", attachUser, async (req, res) => {
   try {
     const { status } = req.query;
 
-    const filter = { kind: "exam" };
+    /** Timed exams only; legacy rows may omit `kind` (treat as exam, not MCQ bank). */
+    const filter = { $nor: [{ kind: "mcq_bank" }] };
     const normalizedStudentSemester = normalizeStudentSemester(req.user);
     if (
       req.user?.role === "Student" &&
@@ -479,11 +480,7 @@ router.patch("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
       return res.status(400).json({ message: "No valid fields to update." });
     }
 
-    const exam = await Exam.findOneAndUpdate(
-      { _id: examId, kind: nextKind },
-      updateDoc,
-      { new: true }
-    ).lean();
+    const exam = await Exam.findOneAndUpdate({ _id: examId }, updateDoc, { new: true }).lean();
     if (!exam) {
       return res.status(404).json({
         message: nextKind === "mcq_bank" ? "MCQ Bank set not found." : "Exam not found.",
@@ -512,7 +509,8 @@ router.delete("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
       return res.status(404).json({ message: "Assessment not found." });
     }
 
-    if (existingExam.kind === "exam") {
+    /** Block delete for timed exams that already have submissions (MCQ bank sets skip this). */
+    if (existingExam.kind !== "mcq_bank") {
       const attemptCount = await Performance.countDocuments({ exam: examId });
       if (attemptCount > 0) {
         return res.status(409).json({
@@ -521,10 +519,11 @@ router.delete("/exams/:examId", attachUser, requireAdmin, async (req, res) => {
       }
     }
 
-    const deletedExam = await Exam.findOneAndDelete({
-      _id: examId,
-      kind: existingExam.kind,
-    }).lean();
+    /**
+     * Delete by id only. Do not add `kind: existingExam.kind` — legacy exams may omit `kind`,
+     * and `{ kind: undefined }` does not match missing-field documents, so delete would no-op.
+     */
+    const deletedExam = await Exam.findByIdAndDelete(examId).lean();
     if (!deletedExam) {
       return res.status(404).json({
         message: existingExam.kind === "mcq_bank" ? "MCQ Bank set not found." : "Exam not found.",
@@ -559,7 +558,7 @@ router.get("/exams/:examId/result", attachUser, requireStudent, async (req, res)
       return res.status(404).json({ message: "No submission found for this exam." });
     }
 
-    const exam = await Exam.findOne({ _id: examId, kind: "exam" })
+    const exam = await Exam.findOne({ _id: examId, $nor: [{ kind: "mcq_bank" }] })
       .select("title subject semester duration totalMarks scheduledAt startTime questions")
       .lean();
 
@@ -602,7 +601,7 @@ router.get("/exams/:examId", attachUser, async (req, res) => {
       return res.status(200).json({ exam: { ...exam, status: getComputedStatus(exam) } });
     }
 
-    if (exam.kind !== "exam") {
+    if (exam.kind === "mcq_bank") {
       return res.status(403).json({
         message: "Students should access MCQ Bank sets from the MCQ Bank page.",
       });
@@ -666,7 +665,10 @@ router.post("/exams/:examId/submit", attachUser, requireStudent, async (req, res
       });
     }
 
-    const exam = await Exam.findOne({ _id: examId, kind: "exam" }).lean();
+    const exam = await Exam.findOne({
+      _id: examId,
+      $nor: [{ kind: "mcq_bank" }],
+    }).lean();
     if (!exam) return res.status(404).json({ message: "Exam not found." });
 
     if (!canStudentAccessExam(req.user, exam)) {
@@ -732,8 +734,8 @@ router.get("/performance/dashboard", attachUser, requireStudent, async (req, res
 
     const match = { student: studentId };
 
-    const bySemesterRaw = await Performance.aggregate([
-      { $match: match },
+    /** Count timed exams only — exclude MCQ bank. Legacy exams may omit `kind`; treat those as exams. */
+    const examLookupStages = [
       {
         $lookup: {
           from: "exams",
@@ -743,6 +745,12 @@ router.get("/performance/dashboard", attachUser, requireStudent, async (req, res
         },
       },
       { $unwind: "$exam" },
+      { $match: { $nor: [{ "exam.kind": "mcq_bank" }] } },
+    ];
+
+    const bySemesterRaw = await Performance.aggregate([
+      { $match: match },
+      ...examLookupStages,
       {
         $addFields: {
           scorePercent: {
@@ -752,6 +760,11 @@ router.get("/performance/dashboard", attachUser, requireStudent, async (req, res
               0,
             ],
           },
+        },
+      },
+      {
+        $match: {
+          "exam.semester": { $gte: 1, $lte: 8 },
         },
       },
       {
@@ -765,23 +778,20 @@ router.get("/performance/dashboard", attachUser, requireStudent, async (req, res
       { $sort: { semester: 1 } },
     ]);
 
-    const bySemester = bySemesterRaw.map((r) => ({
-      semester: Number(r.semester),
-      avgPercentage: Math.round((Number(r.avgPercentage) || 0) * 100) / 100,
-      attemptCount: Number(r.attemptCount || 0),
-    }));
+    const bySemester = bySemesterRaw
+      .map((r) => ({
+        semester: Number(r.semester),
+        avgPercentage: Math.round((Number(r.avgPercentage) || 0) * 100) / 100,
+        attemptCount: Number(r.attemptCount || 0),
+      }))
+      .filter(
+        (row) =>
+          Number.isFinite(row.semester) && row.semester >= 1 && row.semester <= 8
+      );
 
     const subjectRaw = await Performance.aggregate([
       { $match: match },
-      {
-        $lookup: {
-          from: "exams",
-          localField: "exam",
-          foreignField: "_id",
-          as: "exam",
-        },
-      },
-      { $unwind: "$exam" },
+      ...examLookupStages,
       {
         $addFields: {
           scorePercent: {
@@ -820,6 +830,7 @@ router.get("/performance/dashboard", attachUser, requireStudent, async (req, res
 
     const overall = await Performance.aggregate([
       { $match: match },
+      ...examLookupStages,
       {
         $addFields: {
           scorePercent: {
@@ -850,14 +861,113 @@ router.get("/performance/dashboard", attachUser, requireStudent, async (req, res
       .slice(0, 5)
       .map((s) => ({ name: String(s.subject).slice(0, 14), value: cap100(s.avgPercentage) }));
 
+    const summaryRows = await Performance.aggregate([
+      { $match: match },
+      ...examLookupStages,
+      {
+        $addFields: {
+          scorePercent: {
+            $cond: [
+              { $gt: ["$totalMarks", 0] },
+              { $multiply: [{ $divide: ["$score", "$totalMarks"] }, 100] },
+              0,
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAttempts: { $sum: 1 },
+          examIds: { $addToSet: "$exam._id" },
+          lastSubmittedAt: { $max: "$submittedAt" },
+          bestPercentage: { $max: "$scorePercent" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalAttempts: 1,
+          uniqueExamCount: { $size: "$examIds" },
+          lastSubmittedAt: 1,
+          bestPercentage: { $round: ["$bestPercentage", 2] },
+        },
+      },
+    ]);
+
+    const summaryRow = summaryRows[0] || {};
+    const weakestSubject =
+      subjectPerformance.length > 0
+        ? [...subjectPerformance].sort(
+            (a, b) =>
+              a.avgPercentage - b.avgPercentage ||
+              a.attemptCount - b.attemptCount
+          )[0]
+        : null;
+    const strongestSubject =
+      subjectPerformance.length > 0
+        ? [...subjectPerformance].sort(
+            (a, b) =>
+              b.avgPercentage - a.avgPercentage ||
+              b.attemptCount - a.attemptCount
+          )[0]
+        : null;
+
+    const recentAttemptRows = await Performance.find(match)
+      .sort({ submittedAt: -1, createdAt: -1 })
+      .limit(24)
+      .populate("exam", "title subject semester kind")
+      .lean();
+
+    const recentAttempts = recentAttemptRows
+      .filter((row) => row.exam && row.exam.kind !== "mcq_bank")
+      .slice(0, 8)
+      .map((row) => {
+        const score = Number(row.score || 0);
+        const totalMarks = Number(row.totalMarks || 0);
+        const percentage =
+          totalMarks > 0 ? Math.round(((score / totalMarks) * 100) * 100) / 100 : 0;
+
+        return {
+          id: String(row._id),
+          examId: row.exam?._id ? String(row.exam._id) : null,
+          title: String(row.exam?.title || "Untitled Exam"),
+          subject: String(row.exam?.subject || "Unknown Subject"),
+          semester: Number(row.exam?.semester || 0),
+          score,
+          totalMarks,
+          percentage,
+          submittedAt: row.submittedAt || row.createdAt || null,
+        };
+      });
+
     return res.status(200).json({
       overall: {
         avgPercentage: Math.round(Number(overallAvg) * 100) / 100,
         attemptCount: Number(overall[0]?.attemptCount || 0),
       },
+      summary: {
+        totalAttempts: Number(summaryRow.totalAttempts || 0),
+        uniqueExamCount: Number(summaryRow.uniqueExamCount || 0),
+        lastSubmittedAt: summaryRow.lastSubmittedAt || null,
+        bestPercentage: Math.round((Number(summaryRow.bestPercentage) || 0) * 100) / 100,
+        strongestSubject: strongestSubject
+          ? {
+              subject: strongestSubject.subject,
+              avgPercentage: cap100(strongestSubject.avgPercentage),
+            }
+          : null,
+        weakestSubject: weakestSubject
+          ? {
+              subject: weakestSubject.subject,
+              avgPercentage: cap100(weakestSubject.avgPercentage),
+            }
+          : null,
+      },
       bySemester,
       skillRadar: topSkills,
       subjectPerformance,
+      recentAttempts,
     });
   } catch (err) {
     console.error(err);
