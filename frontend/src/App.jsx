@@ -45,6 +45,7 @@ import DashboardLayout from "./Components/layout/DashboardLayout.jsx";
 import AiContentGenerator from "./Components/AiContentGenerator.jsx";
 import AiPerformancePage from "./Pages/PerformancePage.jsx";
 import AiMcqBankPage from "./Pages/McqBankPage.jsx";
+import AiMcqBankStudyPage from "./Pages/McqBankStudyPage.jsx";
 import AiFlashcardDecksPage from "./Pages/FlashcardDecksPage.jsx";
 import AiFlashcardStudyPage from "./Pages/FlashcardStudyPage.jsx";
 import AiExamSchedulePage from "./Pages/ExamSchedulePage.jsx";
@@ -69,6 +70,16 @@ function LegacyExamResultRedirect() {
 function LegacyExamEditRedirect() {
   const { examId } = useParams();
   return <Navigate to={`/ai-tools/exams/${examId}/edit`} replace />;
+}
+
+function LegacyMcqBankStudyRedirect() {
+  const { examId } = useParams();
+  return <Navigate to={`/ai-tools/mcq-bank/${examId}`} replace />;
+}
+
+function LegacyMcqBankEditRedirect() {
+  const { examId } = useParams();
+  return <Navigate to={`/ai-tools/mcq-bank/${examId}/edit`} replace />;
 }
 
 function LegacyStudentNoteDetailRedirect() {
@@ -238,6 +249,8 @@ const App = () => {
             <Route path="performance" element={<AiPerformancePage />} />
             <Route path="mcq-bank" element={<AiMcqBankPage />} />
             <Route path="mcq-bank/create" element={<AdminOnlyCreateMcqBankRoute />} />
+            <Route path="mcq-bank/:examId" element={<AiMcqBankStudyPage />} />
+            <Route path="mcq-bank/:examId/edit" element={<AdminOnlyEditRoute />} />
             <Route path="flashcards" element={<AiFlashcardDecksPage />} />
             <Route path="flashcards/study/:deckId" element={<AiFlashcardStudyPage />} />
             <Route path="exams" element={<AiExamSchedulePage />} />
@@ -252,6 +265,8 @@ const App = () => {
             path="/mcq-bank/create"
             element={<Navigate to="/ai-tools/mcq-bank/create" replace />}
           />
+          <Route path="/mcq-bank/:examId" element={<LegacyMcqBankStudyRedirect />} />
+          <Route path="/mcq-bank/:examId/edit" element={<LegacyMcqBankEditRedirect />} />
           <Route path="/flashcards" element={<Navigate to="/ai-tools/flashcards" replace />} />
           <Route path="/flashcards/study/:deckId" element={<LegacyFlashcardStudyRedirect />} />
           <Route path="/exams" element={<Navigate to="/ai-tools/exams" replace />} />

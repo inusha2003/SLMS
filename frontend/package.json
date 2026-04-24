@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cy:open": "node scripts/run-cypress.cjs open",
+    "cy:run": "node scripts/run-cypress.cjs run",
+    "cy:record": "node scripts/run-cypress.cjs run --record",
+    "cy:run:results": "node scripts/run-cypress.cjs run --spec cypress/e2e/exam-results.cy.js",
+    "cy:run:smart-learning-system": "node scripts/run-cypress.cjs run --spec cypress/e2e/smart-learning-system.cy.js",
+    "cy:record:smart-learning-system": "node scripts/run-cypress.cjs run --record --spec cypress/e2e/smart-learning-system.cy.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -30,6 +36,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "cypress": "^15.5.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
