@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ icon: Icon, label, value, colorClass }) => (
   <div className="rounded-[26px] border border-white/6 bg-[#2b2340] px-5 py-6 shadow-[0_20px_60px_rgba(9,10,24,0.18)]">
     <div className="flex items-center gap-4">
