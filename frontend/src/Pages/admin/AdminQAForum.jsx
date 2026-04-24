@@ -643,7 +643,7 @@ const AdminQAForum = () => {
       ) : questions.length === 0 ? (
         <div className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-16 text-center shadow-[0_24px_70px_rgba(9,10,24,0.18)]">
           <FiMessageSquare className="mx-auto mb-3 text-slate-600" size={36} />
-          <p className="text-lg font-semibold text-white">No questions found</p>
+          <p className="text-lg font-semibold text-white">No Questions Found</p>
           <p className="mt-2 text-sm text-slate-400">
             {search
               ? 'Try different search terms'

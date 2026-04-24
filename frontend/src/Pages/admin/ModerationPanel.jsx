@@ -134,7 +134,7 @@ const ModerationPanel = () => {
               {reports.length === 0 ? (
                 <div className="rounded-[28px] border border-white/6 bg-[#2b2340] px-6 py-20 text-center shadow-[0_24px_70px_rgba(9,10,24,0.2)]">
                   <FiCheck className="mx-auto mb-4 text-green-400" size={42} />
-                  <p className="text-lg font-semibold text-white">No pending reports</p>
+                  <p className="text-lg font-semibold text-white">No Pending Reports</p>
                 </div>
               ) : (
                 reports.map((report) => (
