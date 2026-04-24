@@ -54,11 +54,11 @@ const AdminDashboard = () => {
         <StatCard icon={FiAlertTriangle} label="Pending Reports" value={stats?.pendingReports} colorClass="bg-[#e15811]" />
       </div>
 
-      <div className="rounded-[26px] border border-white/6 bg-[#2b2340] px-6 py-7 shadow-[0_20px_60px_rgba(9,10,24,0.18)]">
-        <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
-        <p className="mt-4 text-base leading-7 text-slate-400">
-          Use the sidebar to navigate to Manage Notes, review Pending Approvals, moderate Q&A,
-          and manage the Moderation Panel.
+      <div className="card">
+        <h2 className="text-white font-semibold mb-3">Quick Actions</h2>
+        <p className="text-slate-400 text-sm">
+          Use the sidebar to navigate to Manage Notes, Review Pending Approvals, Moderate Q&A, and Manage
+          the Moderation Panel.
         </p>
       </div>
     </div>
