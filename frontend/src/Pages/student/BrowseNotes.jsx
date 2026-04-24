@@ -43,7 +43,7 @@ const BrowseNotes = () => {
           <FiSearch className="text-lms-secondary" />
           Browse Notes
         </h1>
-        <p className="mt-2 text-base text-slate-400">Explore approved learning resources</p>
+        <p className="mt-2 text-base text-slate-400">Explore the approved learning resources</p>
       </div>
 
       <NoteFilter
