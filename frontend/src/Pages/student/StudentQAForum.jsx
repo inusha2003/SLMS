@@ -721,7 +721,7 @@ const ForumListPage = () => {
       ) : questions.length === 0 ? (
         <div className="rounded-[28px] border border-dashed border-white/10 bg-[#2b2340] px-6 py-16 text-center">
           <FiMessageSquare className="mx-auto mb-3 text-slate-600" size={36} />
-          <p className="text-xl font-semibold text-white">No questions yet</p>
+          <p className="text-xl font-semibold text-white">No Questions Yet</p>
           <p className="mt-2 text-sm text-slate-400">
             {search ? 'Try different search terms' : 'Be the first to ask!'}
           </p>
