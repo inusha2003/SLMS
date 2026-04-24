@@ -66,7 +66,7 @@ const MyNotes = () => {
           <FiBookOpen className="text-lms-secondary" />
           My Notes
         </h1>
-        <p className="mt-2 text-base text-slate-400">Manage your uploaded notes</p>
+        <p className="mt-2 text-base text-slate-400">Manage your Uploaded Notes</p>
       </div>
 
       {editNote && (
