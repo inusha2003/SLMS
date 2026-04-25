@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { qaApi } from '../../api/qaApi';
 import QuestionForm from '../../components/qa/QuestionForm';
@@ -618,11 +618,13 @@ const QuestionListCard = ({ question }) => {
 
 const ForumListPage = () => {
   const navigate = useNavigate();
+  const formRef = useRef(null);
 
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
+  const [formResetKey, setFormResetKey] = useState(0);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -651,6 +653,7 @@ const ForumListPage = () => {
       setFormLoading(true);
       const res = await qaApi.createQuestion(formData);
       toast.success('Question posted!');
+      setFormResetKey((value) => value + 1);
       setShowForm(false);
       navigate(`/student/qa-forum/${res.data.data._id}`);
     } catch (err) {
@@ -660,34 +663,59 @@ const ForumListPage = () => {
     }
   };
 
+  const openQuestionForm = () => {
+    setShowForm(true);
+    window.requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="mx-auto max-w-[1320px]">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-white">Q&amp;A Forum</h1>
-          <p className="mt-2 text-lg text-slate-400">
+          <h1 className="flex items-center gap-3 text-4xl font-black tracking-tight text-white">
+            <FiEdit2 className="text-violet-400" />
+            Q&amp;A Forum
+          </h1>
+          <p className="mt-2 text-base text-slate-400">
             {total} question{total !== 1 ? 's' : ''} - ask, answer, learn together
           </p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={openQuestionForm}
           className="inline-flex items-center gap-2 self-start rounded-2xl border border-indigo-400/25 bg-[linear-gradient(135deg,rgba(99,102,241,0.95),rgba(79,70,229,0.82))] px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(79,70,229,0.2)] transition-transform hover:-translate-y-0.5"
         >
-          {showForm ? <FiX size={15} /> : <FiPlus size={15} />}
-          {showForm ? 'Cancel' : 'Ask Question'}
+          <FiPlus size={15} />
+          Ask Question
         </button>
       </div>
 
       {showForm && (
-        <div className="mb-6 rounded-[28px] border border-white/8 bg-[#2b2340] px-6 py-6 shadow-[0_22px_50px_rgba(8,10,24,0.18)]">
-          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
-            <FiEdit2 className="text-indigo-300" size={16} />
-            Post a Question
-          </h2>
+        <div
+          ref={formRef}
+          className="mb-6 rounded-[30px] border border-white/6 bg-[#2a2238] px-6 py-7 shadow-[0_24px_70px_rgba(9,10,24,0.28)] md:px-8"
+        >
+          <div className="mb-7 flex items-center gap-2 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-4">
+            <span className="text-sm text-amber-300">
+              Be specific and clear so others can answer quickly and learn together.
+            </span>
+          </div>
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-white font-semibold">Post a Question</h2>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="text-sm text-slate-400 hover:text-white"
+            >
+              Cancel
+            </button>
+          </div>
           <QuestionForm
             onSubmit={handlePostQuestion}
             isLoading={formLoading}
             onCancel={() => setShowForm(false)}
+            resetKey={formResetKey}
           />
         </div>
       )}
@@ -727,7 +755,7 @@ const ForumListPage = () => {
           </p>
           {!search && (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={openQuestionForm}
               className="mt-5 inline-flex rounded-2xl border border-indigo-400/25 bg-[linear-gradient(135deg,rgba(99,102,241,0.95),rgba(79,70,229,0.82))] px-5 py-3 text-sm font-semibold text-white"
             >
               Ask the First Question
